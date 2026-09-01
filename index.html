@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradeVerse AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8'
+            }
+          }
+        }
+      }
+    };
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+  <div class="flex min-h-screen">
+    <aside class="w-64 bg-slate-900 text-slate-200 p-4 hidden md:block">
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold">T</div>
+        <div>
+          <div class="font-bold text-white text-lg">TradeVerse <span class="text-blue-400">AI</span></div>
+          <div class="text-[10px] text-slate-400">NEPSE Paper Trading</div>
+        </div>
+      </div>
+
+      <nav class="space-y-2">
+        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg bg-blue-600 text-white" data-view="dashboard">Dashboard</button>
+        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="markets">Markets</button>
+        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="portfolio">Portfolio</button>
+        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="ai">AI Insights</button>
+        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="sprint">Sprint 1</button>
+      </nav>
+    </aside>
+
+    <main class="flex-1">
+      <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+        <div class="inline-flex items-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-3 py-1 text-xs font-semibold">
+          <i data-lucide="info" class="w-3.5 h-3.5"></i> SIMULATED TRADING (NPR)
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right">
+            <div class="text-[10px] uppercase text-slate-400">Virtual Buying Power</div>
+            <div id="buyingPower" class="font-mono text-sm font-bold">NPR 0.00</div>
+          </div>
+          <button id="quickTradeBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Quick Trade</button>
+        </div>
+      </header>
+
+      <div class="p-6 space-y-6">
+        <section id="view-dashboard" class="view-panel">
+          <h2 class="text-2xl font-bold">Good morning, Trader</h2>
+          <p class="text-slate-500 text-sm">Practice smarter. Trade risk-free on simulated NEPSE data.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
+            <div class="bg-white p-5 rounded-xl border border-slate-200">
+              <p class="text-xs uppercase text-slate-500">Total Portfolio Value</p>
+              <p id="portfolioValue" class="text-2xl font-bold mt-2 font-mono">NPR 0.00</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200">
+              <p class="text-xs uppercase text-slate-500">Available Cash</p>
+              <p id="availableCash" class="text-2xl font-bold mt-2 font-mono">NPR 0.00</p>
+            </div>
+            <div class="bg-white p-5 rounded-xl border border-slate-200">
+              <p class="text-xs uppercase text-slate-500">NEPSE Index</p>
+              <p id="nepseIndex" class="text-2xl font-bold mt-2 font-mono">0.00</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+            <div class="lg:col-span-2 bg-white rounded-xl border border-slate-200 overflow-hidden">
+              <div class="p-4 border-b border-slate-200 flex justify-between items-center">
+                <h3 class="font-bold">Market Overview</h3>
+                <button class="text-sm text-blue-600" data-view="markets">View All</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                  <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+                    <tr>
+                      <th class="p-3">Symbol</th>
+                      <th class="p-3">LTP</th>
+                      <th class="p-3">Change</th>
+                      <th class="p-3">AI Signal</th>
+                      <th class="p-3 text-right">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="marketTable" class="divide-y divide-slate-100 text-sm"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="bg-slate-900 text-white rounded-xl p-5">
+              <div class="text-xs uppercase text-blue-300">AI Market Insight</div>
+              <h4 id="aiTitle" class="text-xl font-bold mt-3">Loading...</h4>
+              <p id="aiSummary" class="text-slate-300 mt-3 text-sm"></p>
+              <div class="mt-6 pt-4 border-t border-slate-700">
+                <div class="flex justify-between text-xs text-slate-300">
+                  <span>Model Confidence</span>
+                  <span id="aiConfidence" class="font-mono font-bold text-emerald-400">0%</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="view-markets" class="view-panel hidden">
+          <h2 class="text-2xl font-bold">NEPSE Market Workspace</h2>
+          <div id="marketsPanel" class="mt-6 space-y-4"></div>
+        </section>
+
+        <section id="view-portfolio" class="view-panel hidden">
+          <h2 class="text-2xl font-bold">Paper Portfolio & Holdings</h2>
+          <div id="portfolioPanel" class="mt-6 space-y-4"></div>
+        </section>
+
+        <section id="view-ai" class="view-panel hidden">
+          <h2 class="text-2xl font-bold">AI Predictive Insights</h2>
+          <div id="aiPanel" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+        </section>
+
+        <section id="view-sprint" class="view-panel hidden">
+          <h2 class="text-2xl font-bold">Development Sprint 1 — Week 3</h2>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
+            <div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs uppercase text-slate-500">Core Modules</p><p class="text-2xl font-bold mt-2 font-mono">3</p></div>
+            <div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs uppercase text-slate-500">AI Workflow</p><p class="text-2xl font-bold mt-2 font-mono">Active</p></div>
+            <div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs uppercase text-slate-500">QA / Reviews</p><p class="text-2xl font-bold mt-2 font-mono">PRs</p></div>
+            <div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs uppercase text-slate-500">Progress</p><p class="text-2xl font-bold mt-2 font-mono">68%</p></div>
+          </div>
+          <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+              <div class="p-4 border-b border-slate-200 font-bold">Sprint 1 Backlog</div>
+              <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+                  <tr><th class="p-3">Module</th><th class="p-3">Owner</th><th class="p-3">Status</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr><td class="p-3">Authentication</td><td class="p-3">Frontend + Backend</td><td class="p-3 text-emerald-600">Complete</td></tr>
+                  <tr><td class="p-3">Navigation</td><td class="p-3">UI/UX Team</td><td class="p-3 text-emerald-600">Complete</td></tr>
+                  <tr><td class="p-3">Basic Trading UI</td><td class="p-3">Prototype</td><td class="p-3 text-amber-600">In Review</td></tr>
+                  <tr><td class="p-3">AI Test Coverage</td><td class="p-3">Copilot + Team</td><td class="p-3 text-blue-600">Planned</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="bg-white border border-slate-200 rounded-xl p-5">
+              <h3 class="font-bold text-lg">Weekly Progress Summary</h3>
+              <ul class="mt-4 space-y-3 text-sm text-slate-600">
+                <li>• Core navigation and section switching are working.</li>
+                <li>• Authentication and demo-trade flows align with the user journey.</li>
+                <li>• Remaining work focuses on QA validation and peer review.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div id="tradeModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-xl w-full max-w-md p-5">
+      <div class="flex justify-between items-center mb-4">
+        <div>
+          <h3 class="font-bold text-lg">Virtual Order Ticket</h3>
+          <p class="text-xs text-slate-500">Paper Trading — No Real Cash Involved</p>
+        </div>
+        <button id="closeTradeModal" class="text-slate-400">✕</button>
+      </div>
+      <form id="tradeForm">
+        <div class="mb-4">
+          <label class="block text-xs uppercase text-slate-500 mb-1">Symbol</label>
+          <input id="tradeSymbol" type="text" class="w-full border border-slate-300 rounded-lg p-2 font-mono" readonly />
+        </div>
+        <div class="grid grid-cols-2 gap-3 mb-4">
+          <div>
+            <label class="block text-xs uppercase text-slate-500 mb-1">Order Side</label>
+            <select id="tradeSide" class="w-full border border-slate-300 rounded-lg p-2">
+              <option>BUY</option>
+              <option>SELL</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs uppercase text-slate-500 mb-1">Quantity</label>
+            <input id="tradeQty" type="number" min="1" value="10" class="w-full border border-slate-300 rounded-lg p-2 font-mono" />
+          </div>
+        </div>
+        <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-4">
+          <div class="flex justify-between text-xs text-slate-500"><span>Estimated Price:</span><span class="font-mono">NPR 1,245.50</span></div>
+          <div class="flex justify-between mt-2 font-bold text-slate-800 border-t border-slate-200 pt-2"><span>Total:</span><span id="tradeTotal" class="font-mono text-blue-600">NPR 12,455.00</span></div>
+        </div>
+        <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg">Confirm Simulated Trade</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const state = { view: 'dashboard' };
+
+    async function fetchJson(url) {
+      const res = await fetch(url);
+      return res.json();
+    }
+
+    function formatMoney(value) {
+      return `NPR ${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    function renderMarketTable(stocks) {
+      const tbody = document.getElementById('marketTable');
+      tbody.innerHTML = stocks.map(stock => `
+        <tr>
+          <td class="p-3 font-semibold">${stock.symbol}<span class="block text-[10px] text-slate-400">${stock.company}</span></td>
+          <td class="p-3 font-mono">${stock.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          <td class="p-3 text-emerald-600 font-semibold">${stock.change > 0 ? '+' : ''}${stock.change}%</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700">${stock.signal} (${stock.confidence}%)</span></td>
+          <td class="p-3 text-right"><button class="trade-btn px-2.5 py-1 border border-blue-200 text-blue-600 rounded text-xs" data-symbol="${stock.symbol}">Trade</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderMarkets(stocks) {
+      const panel = document.getElementById('marketsPanel');
+      panel.innerHTML = `
+        <div class="bg-white border border-slate-200 rounded-xl p-4">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+              <tr><th class="p-3">Asset</th><th class="p-3">Sector</th><th class="p-3">LTP</th><th class="p-3">Change</th><th class="p-3 text-right">Action</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              ${stocks.map(stock => `
+                <tr>
+                  <td class="p-3 font-semibold">${stock.symbol}<span class="block text-[10px] text-slate-400">${stock.company}</span></td>
+                  <td class="p-3 text-slate-500">${stock.sector}</td>
+                  <td class="p-3 font-mono">${stock.price}</td>
+                  <td class="p-3 ${stock.change >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${stock.change}%</td>
+                  <td class="p-3 text-right"><button class="trade-btn px-3 py-1 rounded bg-blue-50 text-blue-600" data-symbol="${stock.symbol}">Trade</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderPortfolio(portfolio) {
+      const panel = document.getElementById('portfolioPanel');
+      panel.innerHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Net Worth</p><p class="text-2xl font-bold mt-2 font-mono">${formatMoney(portfolio.totalNetWorth)}</p></div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Total P/L</p><p class="text-2xl font-bold mt-2 font-mono text-emerald-600">${formatMoney(portfolio.totalProfitLoss)}</p></div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Invested Capital</p><p class="text-2xl font-bold mt-2 font-mono">${formatMoney(portfolio.investedCapital)}</p></div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Cash Balance</p><p class="text-2xl font-bold mt-2 font-mono">${formatMoney(portfolio.cashBalance)}</p></div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-5">
+          <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+              <tr><th class="p-3">Symbol</th><th class="p-3">Units</th><th class="p-3">Avg Cost</th><th class="p-3">LTP</th><th class="p-3">Unrealized P/L</th></tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              ${portfolio.holdings.map(item => `
+                <tr>
+                  <td class="p-3 font-semibold">${item.symbol}</td>
+                  <td class="p-3 font-mono">${item.units}</td>
+                  <td class="p-3 font-mono">${formatMoney(item.avgCost)}</td>
+                  <td class="p-3 font-mono">${formatMoney(item.currentPrice)}</td>
+                  <td class="p-3 font-mono ${item.unrealizedPL >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${formatMoney(item.unrealizedPL)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderAi(stocks) {
+      const panel = document.getElementById('aiPanel');
+      panel.innerHTML = stocks.map(stock => `
+        <div class="bg-white rounded-xl border border-slate-200 p-5">
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-bold text-lg">${stock.symbol}</h3>
+              <p class="text-xs text-slate-500">${stock.company}</p>
+            </div>
+            <span class="px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">${stock.signal}</span>
+          </div>
+          <div class="grid grid-cols-3 gap-2 my-4 border-y border-slate-100 py-3 text-center font-mono text-sm">
+            <div><p class="text-[10px] uppercase text-slate-400">LTP</p><p>${stock.price}</p></div>
+            <div><p class="text-[10px] uppercase text-slate-400">Target</p><p class="text-emerald-600">${(stock.price * 1.03).toFixed(2)}</p></div>
+            <div><p class="text-[10px] uppercase text-slate-400">Confidence</p><p>${stock.confidence}%</p></div>
+          </div>
+          <p class="text-xs text-slate-600">AI rationale: recent price momentum and sentiment suggest ${stock.signal.toLowerCase()} near-term direction.</p>
+        </div>
+      `).join('');
+    }
+
+    function showView(viewName) {
+      document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-blue-600', 'text-white'));
+      document.querySelector(`[data-view="${viewName}"]`)?.classList.add('bg-blue-600', 'text-white');
+    }
+
+    function bindTradeButtons() {
+      document.querySelectorAll('.trade-btn').forEach(button => {
+        button.addEventListener('click', () => {
+          const symbol = button.dataset.symbol;
+          const input = document.getElementById('tradeSymbol');
+          input.value = symbol;
+          document.getElementById('tradeModal').classList.remove('hidden');
+          document.getElementById('tradeModal').classList.add('flex');
+        });
+      });
+    }
+
+    function updateTradeTotal() {
+      const qty = Number(document.getElementById('tradeQty').value || 0);
+      const total = qty * 1245.5;
+      document.getElementById('tradeTotal').textContent = `NPR ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+
+    async function loadDashboard() {
+      const data = await fetchJson('/api/dashboard');
+      document.getElementById('buyingPower').textContent = formatMoney(data.virtualBuyingPower);
+      document.getElementById('portfolioValue').textContent = formatMoney(data.portfolioValue);
+      document.getElementById('availableCash').textContent = formatMoney(data.availableCash);
+      document.getElementById('nepseIndex').textContent = Number(data.nepseIndex).toFixed(2);
+      document.getElementById('aiTitle').textContent = data.aiInsight.title;
+      document.getElementById('aiSummary').textContent = data.aiInsight.summary;
+      document.getElementById('aiConfidence').textContent = `${data.aiInsight.confidence}%`;
+      renderMarketTable(data.marketOverview);
+      bindTradeButtons();
+    }
+
+    async function loadMarket() {
+      const data = await fetchJson('/api/market');
+      const stocks = data.stocks || [];
+      const panel = document.getElementById('marketsPanel');
+      
+      if (!stocks || stocks.length === 0) {
+        panel.innerHTML = '<p class="text-slate-500">No stocks available</p>';
+        return;
+      }
+
+      panel.innerHTML = `
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div class="p-4 border-b border-slate-200 font-bold text-lg">All NEPSE Stocks (${stocks.length})</div>
+          <div class="overflow-x-auto max-h-[600px]">
+            <table class="w-full text-left text-sm">
+              <thead class="bg-slate-50 text-xs uppercase text-slate-500 sticky top-0">
+                <tr>
+                  <th class="p-3">Symbol</th>
+                  <th class="p-3">Company</th>
+                  <th class="p-3">LTP</th>
+                  <th class="p-3">Change %</th>
+                  <th class="p-3">Volume</th>
+                  <th class="p-3">High</th>
+                  <th class="p-3">Low</th>
+                  <th class="p-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                ${stocks.map(stock => `
+                  <tr class="hover:bg-slate-50">
+                    <td class="p-3 font-semibold text-blue-600">${stock.symbol}</td>
+                    <td class="p-3 text-slate-600">${stock.company || stock.symbol}</td>
+                    <td class="p-3 font-mono">${Number(stock.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="p-3 font-semibold ${stock.change >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${stock.change >= 0 ? '+' : ''}${stock.change}%</td>
+                    <td class="p-3 text-slate-600">${Number(stock.volume).toLocaleString()}</td>
+                    <td class="p-3 text-slate-600">${Number(stock.high).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="p-3 text-slate-600">${Number(stock.low).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                    <td class="p-3 text-right"><button class="trade-btn px-3 py-1 rounded bg-blue-50 text-blue-600 text-xs font-medium hover:bg-blue-100" data-symbol="${stock.symbol}">Trade</button></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `;
+      bindTradeButtons();
+    }
+
+    async function loadPortfolio() {
+      const data = await fetchJson('/api/portfolio');
+      renderPortfolio(data);
+    }
+
+    async function loadAi() {
+      const data = await fetchJson('/api/market');
+      const stocks = data.stocks || [];
+      const topStocks = stocks.sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 8);
+      renderAi(topStocks);
+    }
+
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const view = btn.dataset.view;
+        state.view = view;
+        showView(view);
+        if (view === 'dashboard') await loadDashboard();
+        if (view === 'markets') await loadMarket();
+        if (view === 'portfolio') await loadPortfolio();
+        if (view === 'ai') await loadAi();
+      });
+    });
+
+    document.getElementById('quickTradeBtn').addEventListener('click', () => {
+      document.getElementById('tradeSymbol').value = 'NABIL';
+      document.getElementById('tradeModal').classList.remove('hidden');
+      document.getElementById('tradeModal').classList.add('flex');
+    });
+
+    document.getElementById('closeTradeModal').addEventListener('click', () => {
+      document.getElementById('tradeModal').classList.add('hidden');
+      document.getElementById('tradeModal').classList.remove('flex');
+    });
+
+    document.getElementById('tradeQty').addEventListener('input', updateTradeTotal);
+
+    document.getElementById('tradeForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const payload = {
+        symbol: document.getElementById('tradeSymbol').value,
+        side: document.getElementById('tradeSide').value,
+        quantity: Number(document.getElementById('tradeQty').value || 0),
+        price: 1245.5
+      };
+
+      const result = await fetch('/api/trade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(res => res.json());
+
+      alert(result.message || 'Trade submitted.');
+      document.getElementById('tradeModal').classList.add('hidden');
+      document.getElementById('tradeModal').classList.remove('flex');
+    });
+
+    loadDashboard();
+    showView('dashboard');
+    updateTradeTotal();
+    lucide.createIcons();
+  </script>
+</body>
+</html>
