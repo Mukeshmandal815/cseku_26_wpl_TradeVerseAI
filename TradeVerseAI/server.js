@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 const path = require('path');
 const { spawn } = require('child_process');
 const { fetchMarketSnapshot } = require('./src/services/nepseService');
-const { buildDashboardData, createTradeRequest } = require('./src/data/mockData');
+const { buildDashboardData, createTradeRequest, getStockHistory, getNepseHistory, getSprintData, createSprintItem, updateSprintItem, deleteSprintItem, generateRetrospective } = require('./src/data/mockData');
 
 const pythonBin = 'C:\\Users\\User\\AppData\\Local\\Programs\\Python\\Python314\\python.exe';
 const projectRoot = __dirname;
@@ -28,7 +28,7 @@ app.get('/api/health', (req, res) => {
 
 app.get('/api/dashboard', async (req, res) => {
   try {
-    const snapshot = await fetchMarketSnapshot();
+    const snapshot = await fetchMarketSnapshot(String(req.query.exchange || 'nepse').toLowerCase());
     res.json(snapshot.dashboard);
   } catch (error) {
     res.status(500).json({
@@ -40,7 +40,7 @@ app.get('/api/dashboard', async (req, res) => {
 
 app.get('/api/market', async (req, res) => {
   try {
-    const snapshot = await fetchMarketSnapshot();
+    const snapshot = await fetchMarketSnapshot(String(req.query.exchange || 'nepse').toLowerCase());
     res.json(snapshot);
   } catch (error) {
     res.status(500).json({
@@ -92,6 +92,35 @@ app.get('/api/portfolio', (req, res) => {
   });
 });
 
+// New endpoints for historical candlestick data
+app.get('/api/history/nepse', (req, res) => {
+  const days = Math.min(parseInt(req.query.days) || 180, 730); // Max 2 years
+  try {
+    const history = getNepseHistory(days);
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({
+      error: 'Unable to load NEPSE index history',
+      message: error.message
+    });
+  }
+});
+
+app.get('/api/history/:symbol', (req, res) => {
+  const symbol = req.params.symbol.toUpperCase();
+  const days = Math.min(parseInt(req.query.days) || 180, 730); // Max 2 years
+  
+  try {
+    const history = getStockHistory(symbol, days);
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({
+      error: `Unable to load history for ${symbol}`,
+      message: error.message
+    });
+  }
+});
+
 app.post('/api/trade', (req, res) => {
   const trade = createTradeRequest(req.body || {});
 
@@ -114,6 +143,37 @@ app.post('/api/trade', (req, res) => {
     message: 'Virtual order submitted successfully.',
     trade
   });
+});
+
+app.get('/api/sprint', (req, res) => {
+  res.json(getSprintData());
+});
+
+app.post('/api/sprint/items', (req, res) => {
+  try {
+    res.status(201).json(createSprintItem(req.body));
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid backlog item', message: error.message });
+  }
+});
+
+app.put('/api/sprint/items/:id', (req, res) => {
+  try {
+    const item = updateSprintItem(req.params.id, req.body);
+    if (!item) return res.status(404).json({ error: 'Backlog item not found' });
+    res.json(item);
+  } catch (error) {
+    res.status(400).json({ error: 'Invalid backlog item', message: error.message });
+  }
+});
+
+app.delete('/api/sprint/items/:id', (req, res) => {
+  if (!deleteSprintItem(req.params.id)) return res.status(404).json({ error: 'Backlog item not found' });
+  res.status(204).end();
+});
+
+app.post('/api/sprint/retrospective', (req, res) => {
+  res.status(201).json(generateRetrospective(req.body?.notes));
 });
 
 app.get('*', (req, res) => {

@@ -36,8 +36,8 @@ def fetch_dashboard_payload():
     market_status = nepse.get_market_status()
     index_payload = nepse.get_nepse_index()
     stock_rows = nepse.get_stocks()
-    top_gainers = nepse.get_top_gainers(limit=5)
-    top_losers = nepse.get_top_losers(limit=5)
+    top_gainers = nepse.get_top_gainers(limit=10)
+    top_losers = nepse.get_top_losers(limit=10)
 
     nepse_index = {}
     if isinstance(index_payload, list) and index_payload:
