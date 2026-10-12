@@ -1,0 +1,16 @@
+{
+  "name": "tradverse-ai-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npx serve .",
+    "sync:android": "npx cap sync android",
+    "open:android": "npx cap open android",
+    "build:android": "npx cap sync android && cd android && ./gradlew assembleDebug"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/cli": "^6.2.0",
+    "@capacitor/core": "^6.2.0"
+  }
+}

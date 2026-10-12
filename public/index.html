@@ -6,6 +6,7 @@
   <title>TradeVerse AI</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -24,43 +25,106 @@
   </script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
-  <div class="flex min-h-screen">
-    <aside class="w-64 bg-slate-900 text-slate-200 p-4 hidden md:block">
+  <!-- Login/Signin Modal -->
+  <div id="loginModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl">
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-2xl text-white mx-auto mb-4">T</div>
+        <h1 class="text-3xl font-bold">TradeVerse <span class="text-blue-600">AI</span></h1>
+        <p class="text-slate-500 text-sm mt-2">Global markets. One research workspace.</p>
+      </div>
+
+      <div class="space-y-4">
+        <input type="email" id="loginEmail" autocomplete="email" placeholder="Email address" class="w-full border border-slate-300 rounded-lg p-3 text-sm placeholder-slate-400" />
+        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter any password to continue" class="w-full border border-slate-300 rounded-lg p-3 text-sm placeholder-slate-400" />
+        <p id="authMessage" role="alert" aria-live="polite" class="hidden text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-3"></p>
+        <button id="loginBtn" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition">Sign In</button>
+      </div>
+
+      <div class="relative my-6">
+        <div class="absolute inset-0 flex items-center">
+          <div class="w-full border-t border-slate-200"></div>
+        </div>
+        <div class="relative flex justify-center text-sm">
+          <span class="px-2 bg-white text-slate-500">or</span>
+        </div>
+      </div>
+
+      <button id="signupBtn" class="w-full border-2 border-blue-600 text-blue-600 font-semibold py-3 rounded-lg hover:bg-blue-50 transition">Continue in Demo Mode</button>
+
+      <p class="text-center text-xs text-slate-500 mt-6">Demo access only. Email and password are not verified. Demo portfolio data stays in this browser and is not secure or synced.</p>
+    </div>
+  </div>
+
+  <div class="flex flex-col md:flex-row min-h-screen hidden" id="mainApp">
+    <aside class="w-full md:w-64 bg-slate-900 text-slate-200 p-4">
       <div class="flex items-center gap-3 mb-8">
         <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center font-bold">T</div>
         <div>
           <div class="font-bold text-white text-lg">TradeVerse <span class="text-blue-400">AI</span></div>
-          <div class="text-[10px] text-slate-400">NEPSE Paper Trading</div>
+          <div class="text-[10px] text-slate-400">Global Market Research</div>
         </div>
       </div>
 
-      <nav class="space-y-2">
-        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg bg-blue-600 text-white" data-view="dashboard">Dashboard</button>
-        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="markets">Markets</button>
-        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="portfolio">Portfolio</button>
-        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="ai">AI Insights</button>
-        <button class="nav-btn w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="sprint">Sprint 1</button>
+      <nav class="flex gap-2 overflow-x-auto md:block md:space-y-2">
+        <button class="nav-btn shrink-0 md:w-full text-left px-3 py-2 rounded-lg bg-blue-600 text-white" data-view="dashboard">Dashboard</button>
+        <button class="nav-btn shrink-0 md:w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="markets">Markets</button>
+        <button class="nav-btn shrink-0 md:w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="charts">Charts</button>
+        <button class="nav-btn shrink-0 md:w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="portfolio">Portfolio</button>
+        <button class="nav-btn shrink-0 md:w-full text-left px-3 py-2 rounded-lg hover:bg-slate-800" data-view="ai">Market Signals</button>
       </nav>
     </aside>
 
     <main class="flex-1">
-      <header class="h-16 bg-white border-b border-slate-200 px-6 flex items-center justify-between">
+      <header class="min-h-16 bg-white border-b border-slate-200 px-3 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-3">
         <div class="inline-flex items-center gap-2 bg-amber-50 text-amber-700 border border-amber-200 rounded-full px-3 py-1 text-xs font-semibold">
-          <i data-lucide="info" class="w-3.5 h-3.5"></i> SIMULATED TRADING (NPR)
+          <i data-lucide="info" class="w-3.5 h-3.5"></i> PAPER TRADING (<span id="activeCurrency">NPR</span>)
         </div>
-        <div class="flex items-center gap-4">
+        <div id="marketStatusBadge" class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold bg-slate-100 text-slate-600">MARKET CLOSED</div>
+        <div class="flex items-center gap-2 sm:gap-4">
+          <span id="signedInUser" class="hidden text-xs text-slate-500"></span>
           <div class="text-right">
             <div class="text-[10px] uppercase text-slate-400">Virtual Buying Power</div>
             <div id="buyingPower" class="font-mono text-sm font-bold">NPR 0.00</div>
           </div>
           <button id="quickTradeBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Quick Trade</button>
+          <button id="logoutBtn" class="text-sm text-slate-500 hover:text-slate-900">Sign out</button>
         </div>
       </header>
 
       <div class="p-6 space-y-6">
+        <section class="bg-white border border-slate-200 rounded-xl p-4">
+          <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <p class="text-xs uppercase text-slate-500">Market universe</p>
+              <h2 id="selectedExchangeName" class="text-xl font-bold">Nepal Stock Exchange</h2>
+              <p id="selectedExchangeSource" class="text-xs text-slate-500 mt-1">Provider quotes when available; source and timestamps shown</p>
+              <p id="selectedExchangeUpdated" class="text-xs text-slate-400 mt-1"></p>
+            </div>
+            <div class="flex flex-wrap items-center gap-3">
+              <label class="flex items-center gap-3 text-sm font-semibold">
+                <span>Exchange</span>
+                <select id="exchangeSelector" class="border border-slate-300 rounded-lg px-3 py-2 bg-white font-medium">
+                  <option value="nepse">NEPSE · Nepal</option>
+                  <option value="nyse">NYSE · New York</option>
+                  <option value="nasdaq">NASDAQ · United States</option>
+                  <option value="dse">DSE · Dhaka</option>
+                  <option value="sse">SSE · Shanghai</option>
+                  <option value="hkex">HKEX · Hong Kong</option>
+                  <option value="nse">NSE · India</option>
+                  <option value="lse">LSE · London</option>
+                  <option value="tse">TSE · Tokyo</option>
+                  <option value="asx">ASX · Australia</option>
+                </select>
+              </label>
+              <button id="refreshMarketBtn" class="border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold hover:bg-slate-50">Refresh quotes</button>
+            </div>
+          </div>
+        </section>
+
         <section id="view-dashboard" class="view-panel">
           <h2 class="text-2xl font-bold">Good morning, Trader</h2>
-          <p class="text-slate-500 text-sm">Practice smarter. Trade risk-free on simulated NEPSE data.</p>
+          <p id="dashboardSubtitle" class="text-slate-500 text-sm">Market data status is shown for the selected exchange.</p>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mt-6">
             <div class="bg-white p-5 rounded-xl border border-slate-200">
@@ -72,7 +136,7 @@
               <p id="availableCash" class="text-2xl font-bold mt-2 font-mono">NPR 0.00</p>
             </div>
             <div class="bg-white p-5 rounded-xl border border-slate-200">
-              <p class="text-xs uppercase text-slate-500">NEPSE Index</p>
+              <p id="indexLabel" class="text-xs uppercase text-slate-500">Market Index</p>
               <p id="nepseIndex" class="text-2xl font-bold mt-2 font-mono">0.00</p>
             </div>
           </div>
@@ -90,7 +154,7 @@
                       <th class="p-3">Symbol</th>
                       <th class="p-3">LTP</th>
                       <th class="p-3">Change</th>
-                      <th class="p-3">AI Signal</th>
+                      <th class="p-3">Momentum</th>
                       <th class="p-3 text-right">Action</th>
                     </tr>
                   </thead>
@@ -100,72 +164,221 @@
             </div>
 
             <div class="bg-slate-900 text-white rounded-xl p-5">
-              <div class="text-xs uppercase text-blue-300">AI Market Insight</div>
-              <h4 id="aiTitle" class="text-xl font-bold mt-3">Loading...</h4>
+              <div class="text-xs uppercase text-blue-300">Market snapshot</div>
+              <h4 id="aiTitle" class="text-xl font-bold mt-3">Selected market</h4>
               <p id="aiSummary" class="text-slate-300 mt-3 text-sm"></p>
               <div class="mt-6 pt-4 border-t border-slate-700">
                 <div class="flex justify-between text-xs text-slate-300">
-                  <span>Model Confidence</span>
-                  <span id="aiConfidence" class="font-mono font-bold text-emerald-400">0%</span>
+                  <span>Data source</span>
+                  <span id="aiConfidence" class="font-mono font-bold text-emerald-400">Unavailable</span>
                 </div>
               </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 mt-6">
+            <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+              <div class="flex overflow-x-auto border-b border-slate-200" role="tablist" aria-label="Price movers">
+                <button class="performer-tab px-3 py-2 text-xs font-semibold bg-blue-500 text-white whitespace-nowrap" role="tab" aria-selected="true" data-performer-group="movers" data-performer-tab="gainers">Top Gainers</button>
+                <button class="performer-tab px-3 py-2 text-xs text-slate-600 bg-slate-100 whitespace-nowrap" role="tab" aria-selected="false" data-performer-group="movers" data-performer-tab="losers">Top Losers</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead id="performerHead-movers" class="bg-slate-50"></thead>
+                  <tbody id="performerBody-movers" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+              <button class="performer-more px-3 py-2 text-xs text-blue-600 underline" data-performer-more="movers" hidden>View more</button>
+            </div>
+            <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+              <div class="flex overflow-x-auto border-b border-slate-200" role="tablist" aria-label="Trading activity">
+                <button class="performer-tab px-3 py-2 text-xs font-semibold bg-blue-500 text-white whitespace-nowrap" role="tab" aria-selected="true" data-performer-group="activity" data-performer-tab="turnover">Top Turnover</button>
+                <button class="performer-tab px-3 py-2 text-xs text-slate-600 bg-slate-100 whitespace-nowrap" role="tab" aria-selected="false" data-performer-group="activity" data-performer-tab="volume">Top Volume</button>
+                <button class="performer-tab px-3 py-2 text-xs text-slate-600 bg-slate-100 whitespace-nowrap" role="tab" aria-selected="false" data-performer-group="activity" data-performer-tab="transactions">Top Transactions</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead id="performerHead-activity" class="bg-slate-50"></thead>
+                  <tbody id="performerBody-activity" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+              <button class="performer-more px-3 py-2 text-xs text-blue-600 underline" data-performer-more="activity" hidden>View more</button>
+            </div>
+            <div class="bg-white rounded-lg border border-slate-200 overflow-hidden">
+              <div class="flex overflow-x-auto border-b border-slate-200" role="tablist" aria-label="Market demand and supply">
+                <button class="performer-tab px-3 py-2 text-xs font-semibold bg-blue-500 text-white whitespace-nowrap" role="tab" aria-selected="true" data-performer-group="market-depth" data-performer-tab="demand">Top Demand</button>
+                <button class="performer-tab px-3 py-2 text-xs text-slate-600 bg-slate-100 whitespace-nowrap" role="tab" aria-selected="false" data-performer-group="market-depth" data-performer-tab="supply">Top Supply</button>
+                <button class="performer-tab px-3 py-2 text-xs text-slate-600 bg-slate-100 whitespace-nowrap" role="tab" aria-selected="false" data-performer-group="market-depth" data-performer-tab="active">Active Scrips</button>
+              </div>
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead id="performerHead-market-depth" class="bg-slate-50"></thead>
+                  <tbody id="performerBody-market-depth" class="divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+              <button class="performer-more px-3 py-2 text-xs text-blue-600 underline" data-performer-more="market-depth" hidden>View more</button>
             </div>
           </div>
         </section>
 
         <section id="view-markets" class="view-panel hidden">
-          <h2 class="text-2xl font-bold">NEPSE Market Workspace</h2>
+          <h2 id="marketsTitle" class="text-2xl font-bold">Market Workspace</h2>
           <div id="marketsPanel" class="mt-6 space-y-4"></div>
+        </section>
+
+        <section id="view-charts" class="view-panel hidden">
+          <h2 class="text-2xl font-bold">Technical Analysis & Charts</h2>
+          <p class="text-slate-500 text-sm mb-6">Click on any stock to view detailed candlestick chart and price history</p>
+          
+          <div class="space-y-6">
+            <!-- NEPSE Index Chart -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5">
+              <div class="flex justify-between items-center mb-4">
+                <div>
+                    <h3 id="nepseChartTitle" class="font-bold text-lg">NEPSE Index</h3>
+                    <p id="nepseChartUpdated" class="text-xs text-slate-500">Waiting for live data</p>
+                </div>
+                <div class="text-right">
+                    <p id="nepseChartValue" class="text-2xl font-bold font-mono">--</p>
+                    <p class="text-sm font-semibold"><span id="nepseChartChange">--</span> <span id="nepseChartPercent">--</span></p>
+                </div>
+              </div>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4 text-sm">
+                  <div><p class="text-xs text-slate-500">Turnover</p><p id="marketTurnover" class="font-mono font-semibold">--</p></div>
+                  <div><p class="text-xs text-slate-500">Shares traded</p><p id="marketShares" class="font-mono font-semibold">--</p></div>
+                  <div><p class="text-xs text-slate-500">Advanced</p><p id="marketAdvances" class="font-mono font-semibold text-emerald-600">--</p></div>
+                  <div><p class="text-xs text-slate-500">Declined</p><p id="marketDeclines" class="font-mono font-semibold text-rose-600">--</p></div>
+                  <div><p class="text-xs text-slate-500">Unchanged</p><p id="marketUnchanged" class="font-mono font-semibold">--</p></div>
+                </div>
+              <canvas id="nepseChart" height="80"></canvas>
+                <p id="nepseChartMessage" class="text-xs text-slate-500 mt-2"></p>
+            </div>
+
+            <!-- Stock Selector Grid -->
+            <div>
+              <h3 class="font-bold text-lg mb-4">Stock Price Chart</h3>
+              <div class="flex flex-col sm:flex-row gap-3 mb-4">
+                <input id="stockChartSearch" list="stockChartSymbols" placeholder="Search NEPSE symbol or company" class="flex-1 border border-slate-300 rounded-lg px-3 py-2" />
+                <datalist id="stockChartSymbols"></datalist>
+                <button id="loadStockChart" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold">Show chart</button>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 hidden">
+                <button class="stock-selector-btn bg-white border-2 border-slate-200 rounded-xl p-4 hover:border-emerald-400 transition cursor-pointer text-left" data-symbol="NABIL">
+                  <div class="flex justify-between items-start mb-3">
+                    <div>
+                      <h4 class="font-bold text-lg">NABIL</h4>
+                      <p class="text-xs text-slate-500">Nabil Bank Limited</p>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Bullish</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <div>
+                      <p class="text-2xl font-bold font-mono">1245.50</p>
+                      <p class="text-xs text-slate-500">LTP</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xl font-bold text-emerald-600">+1.51%</p>
+                      <p class="text-xs text-slate-500">Conf: 78%</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button class="stock-selector-btn bg-white border-2 border-slate-200 rounded-xl p-4 hover:border-rose-400 transition cursor-pointer text-left" data-symbol="GBIME">
+                  <div class="flex justify-between items-start mb-3">
+                    <div>
+                      <h4 class="font-bold text-lg">GBIME</h4>
+                      <p class="text-xs text-slate-500">Global IME Bank</p>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold bg-rose-100 text-rose-700">Bearish</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <div>
+                      <p class="text-2xl font-bold font-mono">210.00</p>
+                      <p class="text-xs text-slate-500">LTP</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xl font-bold text-rose-600">-0.85%</p>
+                      <p class="text-xs text-slate-500">Conf: 52%</p>
+                    </div>
+                  </div>
+                </button>
+
+                <button class="stock-selector-btn bg-white border-2 border-slate-200 rounded-xl p-4 hover:border-emerald-400 transition cursor-pointer text-left" data-symbol="HDL">
+                  <div class="flex justify-between items-start mb-3">
+                    <div>
+                      <h4 class="font-bold text-lg">HDL</h4>
+                      <p class="text-xs text-slate-500">Himalayan Distillery</p>
+                    </div>
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">Bullish</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <div>
+                      <p class="text-2xl font-bold font-mono">1820.00</p>
+                      <p class="text-xs text-slate-500">LTP</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-xl font-bold text-emerald-600">+2.10%</p>
+                      <p class="text-xs text-slate-500">Conf: 84%</p>
+                    </div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Selected Stock Detailed Chart -->
+            <div id="selectedStockChart" class="bg-white rounded-xl border border-slate-200 p-5 hidden">
+              <div class="flex justify-between items-center mb-6">
+                <div>
+                  <h3 id="detailedChartTitle" class="font-bold text-2xl">NABIL - Nabil Bank Limited</h3>
+                  <p id="detailedChartTradingDate" class="text-xs text-slate-500">Live price samples</p>
+                </div>
+                <button id="closeDetailedChart" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
+              </div>
+              
+              <div class="grid grid-cols-4 gap-3 mb-6 pb-6 border-b border-slate-200">
+                <div>
+                  <p class="text-xs uppercase text-slate-500">Current Price</p>
+                  <p id="detailedPrice" class="text-2xl font-bold font-mono">0.00</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase text-slate-500">Change %</p>
+                  <p id="detailedChange" class="text-2xl font-bold font-mono">0.00%</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase text-slate-500">Session High</p>
+                  <p id="detailedHigh" class="text-2xl font-bold font-mono">0.00</p>
+                </div>
+                <div>
+                  <p class="text-xs uppercase text-slate-500">Session Low</p>
+                  <p id="detailedLow" class="text-2xl font-bold font-mono">0.00</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 id="stockChartHeading" class="font-semibold mb-4">Live price samples</h4>
+                <canvas id="detailedChart" height="100"></canvas>
+              </div>
+            </div>
+          </div>
         </section>
 
         <section id="view-portfolio" class="view-panel hidden">
           <h2 class="text-2xl font-bold">Paper Portfolio & Holdings</h2>
           <div id="portfolioPanel" class="mt-6 space-y-4"></div>
+          <div id="ordersPanel" class="mt-6"></div>
         </section>
 
         <section id="view-ai" class="view-panel hidden">
-          <h2 class="text-2xl font-bold">AI Predictive Insights</h2>
+          <h2 class="text-2xl font-bold">Market Signals</h2>
+          <p class="text-sm text-slate-500 mt-1">Momentum indicators from the selected exchange. Educational only; not investment advice.</p>
           <div id="aiPanel" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5"></div>
-        </section>
-
-        <section id="view-sprint" class="view-panel hidden">
-          <h2 class="text-2xl font-bold">Development Sprint 1 — Week 3</h2>
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-            <div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs uppercase text-slate-500">Core Modules</p><p class="text-2xl font-bold mt-2 font-mono">3</p></div>
-            <div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs uppercase text-slate-500">AI Workflow</p><p class="text-2xl font-bold mt-2 font-mono">Active</p></div>
-            <div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs uppercase text-slate-500">QA / Reviews</p><p class="text-2xl font-bold mt-2 font-mono">PRs</p></div>
-            <div class="bg-white border border-slate-200 rounded-xl p-5"><p class="text-xs uppercase text-slate-500">Progress</p><p class="text-2xl font-bold mt-2 font-mono">68%</p></div>
-          </div>
-          <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-              <div class="p-4 border-b border-slate-200 font-bold">Sprint 1 Backlog</div>
-              <table class="w-full text-left text-sm">
-                <thead class="bg-slate-50 text-xs uppercase text-slate-500">
-                  <tr><th class="p-3">Module</th><th class="p-3">Owner</th><th class="p-3">Status</th></tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                  <tr><td class="p-3">Authentication</td><td class="p-3">Frontend + Backend</td><td class="p-3 text-emerald-600">Complete</td></tr>
-                  <tr><td class="p-3">Navigation</td><td class="p-3">UI/UX Team</td><td class="p-3 text-emerald-600">Complete</td></tr>
-                  <tr><td class="p-3">Basic Trading UI</td><td class="p-3">Prototype</td><td class="p-3 text-amber-600">In Review</td></tr>
-                  <tr><td class="p-3">AI Test Coverage</td><td class="p-3">Copilot + Team</td><td class="p-3 text-blue-600">Planned</td></tr>
-                </tbody>
-              </table>
-            </div>
-            <div class="bg-white border border-slate-200 rounded-xl p-5">
-              <h3 class="font-bold text-lg">Weekly Progress Summary</h3>
-              <ul class="mt-4 space-y-3 text-sm text-slate-600">
-                <li>• Core navigation and section switching are working.</li>
-                <li>• Authentication and demo-trade flows align with the user journey.</li>
-                <li>• Remaining work focuses on QA validation and peer review.</li>
-              </ul>
-            </div>
-          </div>
         </section>
       </div>
     </main>
   </div>
+  </div>
 
-  <div id="tradeModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center p-4">
+  <div id="tradeModal" class="fixed inset-0 bg-slate-900/50 hidden items-center justify-center p-4 z-40">
     <div class="bg-white rounded-xl w-full max-w-md p-5">
       <div class="flex justify-between items-center mb-4">
         <div>
@@ -193,8 +406,8 @@
           </div>
         </div>
         <div class="bg-slate-50 border border-slate-200 rounded-lg p-3 mb-4">
-          <div class="flex justify-between text-xs text-slate-500"><span>Estimated Price:</span><span class="font-mono">NPR 1,245.50</span></div>
-          <div class="flex justify-between mt-2 font-bold text-slate-800 border-t border-slate-200 pt-2"><span>Total:</span><span id="tradeTotal" class="font-mono text-blue-600">NPR 12,455.00</span></div>
+          <div class="flex justify-between text-xs text-slate-500"><span>Estimated Price:</span><span id="tradePrice" class="font-mono">NPR 0.00</span></div>
+          <div class="flex justify-between mt-2 font-bold text-slate-800 border-t border-slate-200 pt-2"><span>Total:</span><span id="tradeTotal" class="font-mono text-blue-600">NPR 0.00</span></div>
         </div>
         <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2.5 rounded-lg">Confirm Simulated Trade</button>
       </form>
@@ -202,52 +415,180 @@
   </div>
 
   <script>
-    const state = { view: 'dashboard' };
+    const DEMO_USER_KEY = 'tradeverse_demo_user';
+    const DEMO_DATA_PREFIX = 'tradeverse_demo_data:';
+    const state = { view: 'dashboard', exchange: 'nepse', market: null, marketFetchedAt: 0, portfolio: null, selectedChartSymbol: null, chartTimer: null, csrfToken: null, user: null, performerData: {}, expandedPerformerGroups: new Set() };
 
-    async function fetchJson(url) {
-      const res = await fetch(url);
-      return res.json();
+    async function request(url, options = {}) {
+      const method = String(options.method || 'GET').toUpperCase();
+      const headers = new Headers(options.headers || {});
+      if (options.body && !headers.has('Content-Type')) headers.set('Content-Type', 'application/json');
+      if (method !== 'GET' && state.csrfToken) headers.set('X-CSRF-Token', state.csrfToken);
+      const response = await fetch(url, { ...options, headers, method });
+      if (response.status === 204) return null;
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.error || 'The request could not be completed.');
+      return result;
     }
 
+    const fetchJson = url => request(url);
+    const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[character]);
+
     function formatMoney(value) {
-      return `NPR ${Number(value || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const currency = state.market?.currency || 'NPR';
+      const fractionDigits = currency === 'JPY' ? 0 : 2;
+      return new Intl.NumberFormat(state.market?.locale || 'en-NP', { style: 'currency', currency, minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }).format(Number(value || 0));
+    }
+
+    function formatPrice(value) {
+      const currency = state.market?.currency || 'NPR';
+      const fractionDigits = currency === 'JPY' ? 0 : 2;
+      return new Intl.NumberFormat(state.market?.locale || 'en-NP', { style: 'currency', currency, minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }).format(Number(value || 0));
+    }
+
+    function renderMarketStatus(status) {
+      const badge = document.getElementById('marketStatusBadge');
+      const isOpen = status?.isOpen === true || String(status?.isOpen || status?.state || status?.status || '').toUpperCase().includes('OPEN');
+      badge.textContent = status?.isIndicative ? `SCHEDULE ${isOpen ? 'OPEN' : 'CLOSED'}` : isOpen ? 'MARKET OPEN' : 'MARKET CLOSED';
+      badge.className = `inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ${isOpen ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`;
+      badge.title = status?.localTime
+        ? `${status.isIndicative ? 'Indicative session hours' : 'Exchange-reported market status'} · ${status.localTime} · ${status.session || 'hours unavailable'}`
+        : 'Exchange-reported market status';
+    }
+
+    function marketChange(stock) {
+      return Number(stock.change ?? stock.percentageChange ?? 0);
+    }
+
+    function marketPrice(stock) {
+      return Number(stock.price ?? stock.ltp ?? stock.lastTradedPrice ?? 0);
+    }
+
+    const performerTabs = {
+      gainers: { group: 'movers', columns: [['symbol', 'Symbol'], ['price', 'LTP'], ['pointChange', 'Pt. Change'], ['change', '% Change']] },
+      losers: { group: 'movers', columns: [['symbol', 'Symbol'], ['price', 'LTP'], ['pointChange', 'Pt. Change'], ['change', '% Change']] },
+      turnover: { group: 'activity', columns: [['symbol', 'Symbol'], ['turnover', 'Turnover'], ['price', 'LTP']] },
+      volume: { group: 'activity', columns: [['symbol', 'Symbol'], ['volume', 'Volume'], ['price', 'LTP']] },
+      transactions: { group: 'activity', columns: [['symbol', 'Symbol'], ['transactions', 'Transactions'], ['price', 'LTP']] },
+      demand: { group: 'market-depth', columns: [['symbol', 'Symbol'], ['buyQuantity', 'Top Buy Quantity'], ['buyOrders', 'Buy Orders']] },
+      supply: { group: 'market-depth', columns: [['symbol', 'Symbol'], ['sellQuantity', 'Top Sell Quantity'], ['sellOrders', 'Sell Orders']] },
+      active: { group: 'market-depth', columns: [['symbol', 'Symbol'], ['volume', 'Volume'], ['price', 'LTP']] }
+    };
+
+    function getPerformerRows(tab) {
+      const stocks = (state.performerData.marketOverview || state.performerData.stocks || [])
+        .filter(stock => stock?.symbol && marketPrice(stock) > 0);
+      const byChange = (a, b) => marketChange(b) - marketChange(a);
+      const turnoverRows = stocks.filter(stock => Number(stock.turnover) > 0);
+      const volumeRows = stocks.filter(stock => Number(stock.volume) > 0);
+      const transactionRows = (state.performerData.topTransactions || [])
+        .filter(stock => stock?.symbol && Number(stock.transactions) > 0);
+
+      if (tab === 'gainers') return stocks.filter(stock => marketChange(stock) > 0).sort(byChange).slice(0, 10);
+      if (tab === 'losers') return stocks.filter(stock => marketChange(stock) < 0).sort((a, b) => marketChange(a) - marketChange(b)).slice(0, 10);
+      if (tab === 'turnover') return turnoverRows.sort((a, b) => b.turnover - a.turnover);
+      if (tab === 'volume' || tab === 'active') return volumeRows.sort((a, b) => b.volume - a.volume);
+      if (tab === 'transactions') return transactionRows.sort((a, b) => b.transactions - a.transactions);
+      if (tab === 'demand') return stocks.filter(stock => Number(stock.buyQuantity) > 0).sort((a, b) => b.buyQuantity - a.buyQuantity);
+      if (tab === 'supply') return stocks.filter(stock => Number(stock.sellQuantity) > 0).sort((a, b) => b.sellQuantity - a.sellQuantity);
+      return [];
+    }
+
+    function formatPerformerValue(key, value) {
+      if (key === 'symbol') return escapeHtml(value);
+      if (key === 'price' || key === 'turnover') return Number.isFinite(Number(value)) ? formatPrice(value) : '—';
+      if (key === 'change' || key === 'pointChange') {
+        const number = Number(value);
+        return Number.isFinite(number) ? `${number > 0 ? '+' : ''}${number.toFixed(2)}${key === 'change' ? '%' : ''}` : '—';
+      }
+      const number = Number(value);
+      return Number.isFinite(number) && number > 0 ? number.toLocaleString() : '—';
+    }
+
+    function renderPerformerGroup(group) {
+      const tab = document.querySelector(`.performer-tab[data-performer-group="${group}"][aria-selected="true"]`)?.dataset.performerTab;
+      const definition = performerTabs[tab];
+      if (!definition) return;
+      const head = document.getElementById(`performerHead-${group}`);
+      const body = document.getElementById(`performerBody-${group}`);
+      const moreButton = document.querySelector(`.performer-more[data-performer-more="${group}"]`);
+      const rows = getPerformerRows(tab);
+      const expanded = state.expandedPerformerGroups.has(group);
+      const shownRows = expanded ? rows : rows.slice(0, 5);
+      head.innerHTML = `<tr>${definition.columns.map(([key, label]) => `<th class="px-2 py-2 font-semibold whitespace-nowrap ${key === 'symbol' ? '' : 'text-right'}">${label}</th>`).join('')}</tr>`;
+
+      if (!rows.length) {
+        const message = tab === 'demand' || tab === 'supply'
+          ? 'Live order-book data is not provided by this exchange feed.'
+          : 'No data is available for this metric.';
+        body.innerHTML = `<tr><td colspan="${definition.columns.length}" class="px-3 py-4 text-center text-slate-500">${message}</td></tr>`;
+      } else {
+        body.innerHTML = shownRows.map(stock => `<tr>${definition.columns.map(([key]) => {
+          const value = formatPerformerValue(key, stock[key]);
+          if (key === 'symbol') {
+            return `<td class="px-2 py-2 whitespace-nowrap"><button class="stock-link text-blue-700 hover:underline" data-symbol="${escapeHtml(stock.symbol)}">${value}</button></td>`;
+          }
+          const color = key === 'change' || key === 'pointChange'
+            ? Number(stock[key]) >= 0 ? 'text-emerald-600' : 'text-rose-600'
+            : 'text-slate-700';
+          return `<td class="px-2 py-2 text-right whitespace-nowrap font-mono ${color}">${value}</td>`;
+        }).join('')}</tr>`).join('');
+      }
+      moreButton.hidden = rows.length <= 5;
+      moreButton.textContent = expanded ? 'View less' : 'View more';
+      bindStockLinks();
+    }
+
+    function renderPerformers(data) {
+      state.performerData = data;
+      ['movers', 'activity', 'market-depth'].forEach(renderPerformerGroup);
     }
 
     function renderMarketTable(stocks) {
       const tbody = document.getElementById('marketTable');
       tbody.innerHTML = stocks.map(stock => `
         <tr>
-          <td class="p-3 font-semibold">${stock.symbol}<span class="block text-[10px] text-slate-400">${stock.company}</span></td>
-          <td class="p-3 font-mono">${stock.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-          <td class="p-3 text-emerald-600 font-semibold">${stock.change > 0 ? '+' : ''}${stock.change}%</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-medium bg-emerald-50 text-emerald-700">${stock.signal} (${stock.confidence}%)</span></td>
-          <td class="p-3 text-right"><button class="trade-btn px-2.5 py-1 border border-blue-200 text-blue-600 rounded text-xs" data-symbol="${stock.symbol}">Trade</button></td>
+          <td class="p-3 font-semibold"><span class="stock-link cursor-pointer hover:text-blue-600" data-symbol="${escapeHtml(stock.symbol)}">${escapeHtml(stock.symbol)}</span><span class="block text-[10px] text-slate-400">${escapeHtml(stock.company)}</span></td>
+          <td class="p-3 font-mono">${formatPrice(stock.price)}</td>
+          <td class="p-3 ${stock.change >= 0 ? 'text-emerald-600' : 'text-rose-600'} font-semibold">${stock.change > 0 ? '+' : ''}${stock.change}%</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded text-xs font-medium ${stock.change >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}">${stock.change >= 0 ? 'Positive' : 'Negative'}</span></td>
+          <td class="p-3 text-right"><button class="trade-btn px-2.5 py-1 border border-blue-200 text-blue-600 rounded text-xs" data-symbol="${escapeHtml(stock.symbol)}">Trade</button></td>
         </tr>
       `).join('');
+      bindStockLinks();
+      bindTradeButtons();
     }
 
     function renderMarkets(stocks) {
       const panel = document.getElementById('marketsPanel');
       panel.innerHTML = `
-        <div class="bg-white border border-slate-200 rounded-xl p-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead class="bg-slate-50 text-xs uppercase text-slate-500">
               <tr><th class="p-3">Asset</th><th class="p-3">Sector</th><th class="p-3">LTP</th><th class="p-3">Change</th><th class="p-3 text-right">Action</th></tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
               ${stocks.map(stock => `
-                <tr>
-                  <td class="p-3 font-semibold">${stock.symbol}<span class="block text-[10px] text-slate-400">${stock.company}</span></td>
-                  <td class="p-3 text-slate-500">${stock.sector}</td>
-                  <td class="p-3 font-mono">${stock.price}</td>
-                  <td class="p-3 ${stock.change >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${stock.change}%</td>
-                  <td class="p-3 text-right"><button class="trade-btn px-3 py-1 rounded bg-blue-50 text-blue-600" data-symbol="${stock.symbol}">Trade</button></td>
+                <tr class="${stock.change < 0 ? 'bg-red-50' : ''}">
+                  <td class="p-3 font-semibold"><span class="stock-link cursor-pointer hover:text-blue-600" data-symbol="${escapeHtml(stock.symbol)}">${escapeHtml(stock.symbol)}</span><span class="block text-[10px] text-slate-400">${escapeHtml(stock.company)}</span></td>
+                  <td class="p-3 text-slate-500">${escapeHtml(stock.sector)}</td>
+                  <td class="p-3 font-mono">${formatPrice(stock.price)}</td>
+                  <td class="p-3 ${stock.change >= 0 ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}">${stock.change >= 0 ? '+' : ''}${Number(stock.change).toFixed(2)}%</td>
+                  <td class="p-3 text-right"><button class="trade-btn px-3 py-1 rounded ${stock.change >= 0 ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'}" data-symbol="${escapeHtml(stock.symbol)}">Trade</button></td>
                 </tr>
               `).join('')}
             </tbody>
           </table>
         </div>
       `;
+      bindStockLinks();
+      bindTradeButtons();
     }
 
     function renderPortfolio(portfolio) {
@@ -255,50 +596,121 @@
       panel.innerHTML = `
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Net Worth</p><p class="text-2xl font-bold mt-2 font-mono">${formatMoney(portfolio.totalNetWorth)}</p></div>
-          <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Total P/L</p><p class="text-2xl font-bold mt-2 font-mono text-emerald-600">${formatMoney(portfolio.totalProfitLoss)}</p></div>
+          <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Total P/L</p><p class="text-2xl font-bold mt-2 font-mono ${portfolio.totalProfitLoss >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${formatMoney(portfolio.totalProfitLoss)}</p></div>
           <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Invested Capital</p><p class="text-2xl font-bold mt-2 font-mono">${formatMoney(portfolio.investedCapital)}</p></div>
           <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Cash Balance</p><p class="text-2xl font-bold mt-2 font-mono">${formatMoney(portfolio.cashBalance)}</p></div>
         </div>
-        <div class="bg-white border border-slate-200 rounded-xl p-5">
+        <div class="bg-white border border-slate-200 rounded-xl p-5 overflow-x-auto">
           <table class="w-full text-left text-sm">
             <thead class="bg-slate-50 text-xs uppercase text-slate-500">
               <tr><th class="p-3">Symbol</th><th class="p-3">Units</th><th class="p-3">Avg Cost</th><th class="p-3">LTP</th><th class="p-3">Unrealized P/L</th></tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              ${portfolio.holdings.map(item => `
-                <tr>
-                  <td class="p-3 font-semibold">${item.symbol}</td>
+              ${portfolio.holdings.length ? portfolio.holdings.map(item => `
+                <tr class="${item.unrealizedPL < 0 ? 'bg-red-50' : ''}">
+                  <td class="p-3 font-semibold"><span class="stock-link cursor-pointer hover:text-blue-600" data-symbol="${escapeHtml(item.symbol)}">${escapeHtml(item.symbol)}</span></td>
                   <td class="p-3 font-mono">${item.units}</td>
                   <td class="p-3 font-mono">${formatMoney(item.avgCost)}</td>
                   <td class="p-3 font-mono">${formatMoney(item.currentPrice)}</td>
-                  <td class="p-3 font-mono ${item.unrealizedPL >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${formatMoney(item.unrealizedPL)}</td>
+                  <td class="p-3 font-mono ${item.unrealizedPL >= 0 ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'}">${formatMoney(item.unrealizedPL)}</td>
                 </tr>
-              `).join('')}
+              `).join('') : '<tr><td colspan="5" class="p-5 text-center text-slate-500">No holdings on this exchange yet.</td></tr>'}
             </tbody>
           </table>
         </div>
       `;
+      bindStockLinks();
+    }
+
+    function demoDataKey() {
+      if (!state.user?.email) throw new Error('Sign in to the demo workspace first.');
+      return `${DEMO_DATA_PREFIX}${encodeURIComponent(state.user.email.toLowerCase())}`;
+    }
+
+    function readDemoAccount() {
+      const stored = localStorage.getItem(demoDataKey());
+      if (!stored) return { exchanges: {} };
+      const account = JSON.parse(stored);
+      if (!account || typeof account !== 'object' || !account.exchanges || typeof account.exchanges !== 'object') {
+        throw new Error('Stored demo portfolio data is invalid. Clear this site’s local storage to reset the demo.');
+      }
+      return account;
+    }
+
+    function writeDemoAccount(account) {
+      localStorage.setItem(demoDataKey(), JSON.stringify(account));
+    }
+
+    function getDemoExchange(account, exchange = state.exchange) {
+      if (!account.exchanges[exchange]) {
+        account.exchanges[exchange] = { cashBalance: 682400, holdings: [], orders: [] };
+      }
+      return account.exchanges[exchange];
+    }
+
+    function calculatePortfolio(portfolio) {
+      const holdings = (portfolio.holdings || []).map(item => {
+        const quote = state.market?.stocks?.find(stock => stock.symbol === item.symbol);
+        const units = Number(item.units || 0);
+        const avgCost = Number(item.avgCost || 0);
+        const currentPrice = Number(quote?.price ?? item.currentPrice ?? avgCost);
+        return { ...item, units, avgCost, currentPrice, unrealizedPL: (currentPrice - avgCost) * units };
+      }).filter(item => item.units > 0);
+      const cashBalance = Number(portfolio.cashBalance ?? portfolio.availableCash ?? 0);
+      const marketValue = holdings.reduce((sum, item) => sum + item.units * item.currentPrice, 0);
+      return {
+        ...portfolio,
+        holdings,
+        cashBalance,
+        marketValue,
+        totalNetWorth: cashBalance + marketValue,
+        totalProfitLoss: holdings.reduce((sum, item) => sum + item.unrealizedPL, 0),
+        investedCapital: holdings.reduce((sum, item) => sum + item.units * item.avgCost, 0)
+      };
+    }
+
+    async function getPortfolioState() {
+      const account = readDemoAccount();
+      state.portfolio = calculatePortfolio(getDemoExchange(account));
+      return state.portfolio;
+    }
+
+    async function loadPortfolio() {
+      const portfolio = await getPortfolioState();
+      renderPortfolio(portfolio);
+      const { orders } = getDemoExchange(readDemoAccount());
+      document.getElementById('ordersPanel').innerHTML = `
+        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
+          <div class="p-4 border-b border-slate-200"><h3 class="font-bold">Recent paper orders</h3><p class="text-xs text-slate-500">Last 50 orders for this exchange</p></div>
+          <div class="overflow-x-auto"><table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="p-3">Time</th><th class="p-3">Symbol</th><th class="p-3">Side</th><th class="p-3">Quantity</th><th class="p-3">Price</th><th class="p-3">Total</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">${orders.length ? orders.map(order => `
+              <tr><td class="p-3">${escapeHtml(new Date(order.timestamp).toLocaleString())}</td><td class="p-3 font-semibold">${escapeHtml(order.symbol)}</td><td class="p-3 ${order.side === 'BUY' ? 'text-emerald-700' : 'text-rose-700'}">${order.side}</td><td class="p-3">${order.quantity}</td><td class="p-3 font-mono">${formatPrice(order.price)}</td><td class="p-3 font-mono">${formatPrice(order.total)}</td></tr>
+            `).join('') : '<tr><td colspan="6" class="p-5 text-center text-slate-500">No paper orders yet.</td></tr>'}</tbody>
+          </table></div>
+        </div>`;
     }
 
     function renderAi(stocks) {
       const panel = document.getElementById('aiPanel');
-      panel.innerHTML = stocks.map(stock => `
-        <div class="bg-white rounded-xl border border-slate-200 p-5">
+      panel.innerHTML = stocks.length ? stocks.map(stock => `
+        <div class="bg-white rounded-xl border border-slate-200 p-5 ${stock.change < 0 ? 'border-rose-300' : 'border-emerald-300'}">
           <div class="flex justify-between items-start">
             <div>
-              <h3 class="font-bold text-lg">${stock.symbol}</h3>
-              <p class="text-xs text-slate-500">${stock.company}</p>
+              <h3 class="font-bold text-lg cursor-pointer hover:text-blue-600 stock-link" data-symbol="${escapeHtml(stock.symbol)}">${escapeHtml(stock.symbol)}</h3>
+              <p class="text-xs text-slate-500">${escapeHtml(stock.company)}</p>
             </div>
-            <span class="px-2 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-semibold">${stock.signal}</span>
+            <span class="px-2 py-1 rounded-full ${stock.change >= 0 ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'} text-xs font-semibold">${stock.change >= 0 ? 'Positive' : 'Negative'} momentum</span>
           </div>
           <div class="grid grid-cols-3 gap-2 my-4 border-y border-slate-100 py-3 text-center font-mono text-sm">
-            <div><p class="text-[10px] uppercase text-slate-400">LTP</p><p>${stock.price}</p></div>
-            <div><p class="text-[10px] uppercase text-slate-400">Target</p><p class="text-emerald-600">${(stock.price * 1.03).toFixed(2)}</p></div>
-            <div><p class="text-[10px] uppercase text-slate-400">Confidence</p><p>${stock.confidence}%</p></div>
+            <div><p class="text-[10px] uppercase text-slate-400">Last price</p><p>${formatPrice(stock.price)}</p></div>
+            <div><p class="text-[10px] uppercase text-slate-400">Change</p><p class="${stock.change >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${stock.change >= 0 ? '+' : ''}${Number(stock.change).toFixed(2)}%</p></div>
+            <div><p class="text-[10px] uppercase text-slate-400">Volume</p><p>${Number(stock.volume || 0).toLocaleString()}</p></div>
           </div>
-          <p class="text-xs text-slate-600">AI rationale: recent price momentum and sentiment suggest ${stock.signal.toLowerCase()} near-term direction.</p>
+          <p class="text-xs text-slate-600">Momentum reflects the reported price change only; it is not a forecast.</p>
         </div>
-      `).join('');
+      `).join('') : '<p class="text-sm text-slate-500">No provider quotes are available for this exchange right now.</p>';
+      bindStockLinks();
     }
 
     function showView(viewName) {
@@ -314,108 +726,548 @@
           const symbol = button.dataset.symbol;
           const input = document.getElementById('tradeSymbol');
           input.value = symbol;
+          const stock = state.market?.stocks?.find(item => item.symbol === symbol);
+          state.currentPrice = Number(stock?.price || 0);
+          updateTradeTotal();
           document.getElementById('tradeModal').classList.remove('hidden');
           document.getElementById('tradeModal').classList.add('flex');
         });
       });
     }
 
+    function bindStockLinks() {
+      document.querySelectorAll('.stock-link').forEach(link => {
+        link.addEventListener('click', async () => {
+          const symbol = link.dataset.symbol;
+          // Switch to Charts view if not already there
+          if (state.view !== 'charts') {
+            showView('charts');
+            await loadCharts();
+          }
+          // Load the stock detail
+          await loadStockDetail(symbol);
+        });
+      });
+    }
+
     function updateTradeTotal() {
       const qty = Number(document.getElementById('tradeQty').value || 0);
-      const total = qty * 1245.5;
-      document.getElementById('tradeTotal').textContent = `NPR ${total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      const price = state.currentPrice || 0;
+      document.getElementById('tradePrice').textContent = formatPrice(price);
+      document.getElementById('tradeTotal').textContent = formatPrice(qty * price);
     }
 
     async function loadDashboard() {
-      const data = await fetchJson('/api/dashboard');
-      document.getElementById('buyingPower').textContent = formatMoney(data.virtualBuyingPower);
-      document.getElementById('portfolioValue').textContent = formatMoney(data.portfolioValue);
-      document.getElementById('availableCash').textContent = formatMoney(data.availableCash);
-      document.getElementById('nepseIndex').textContent = Number(data.nepseIndex).toFixed(2);
-      document.getElementById('aiTitle').textContent = data.aiInsight.title;
-      document.getElementById('aiSummary').textContent = data.aiInsight.summary;
-      document.getElementById('aiConfidence').textContent = `${data.aiInsight.confidence}%`;
+      const data = await fetchJson(`/api/dashboard?exchange=${state.exchange}`);
+      const marketExchange = data.exchange || data;
+      state.market = { ...marketExchange, ...data, stocks: data.marketOverview || marketExchange.stocks || [] };
+      state.marketFetchedAt = Date.now();
+      state.currentPrice = data.marketOverview?.[0]?.price || 0;
+      state.portfolio = await getPortfolioState();
+      document.getElementById('activeCurrency').textContent = state.market.currency || 'NPR';
+      renderMarketStatus(data.marketStatus || state.market.marketStatus);
+      document.getElementById('buyingPower').textContent = formatMoney(state.portfolio.cashBalance);
+      document.getElementById('portfolioValue').textContent = formatMoney(state.portfolio.totalNetWorth);
+      document.getElementById('availableCash').textContent = formatMoney(state.portfolio.cashBalance);
+      const exchange = data.exchange || {};
+      document.getElementById('selectedExchangeName').textContent = exchange.name || 'Nepal Stock Exchange';
+      document.getElementById('selectedExchangeSource').textContent = data.source === 'nepse-live'
+        ? 'NEPSE live feed'
+        : data.source === 'twelve-data-live'
+          ? `Twelve Data quotes · ${exchange.liveSymbols?.length || 0}/${exchange.watchlistCount || exchange.liveSymbols?.length || 0} symbols · index is reference`
+          : data.source === 'yahoo-finance-unofficial'
+            ? `Yahoo Finance unofficial quotes · may be delayed · ${exchange.quoteSymbols?.length || 0}/${exchange.watchlistCount || exchange.quoteSymbols?.length || 0} symbols · index is reference`
+          : 'Simulated educational data · live provider unavailable';
+      document.getElementById('selectedExchangeUpdated').textContent = data.updatedAt
+        ? `Provider timestamp: ${String(data.updatedAt).replace('T', ' ').slice(0, 19)}`
+        : `Last requested: ${new Date().toLocaleTimeString()}`;
+      document.getElementById('dashboardSubtitle').textContent = data.source === 'mock-provider' || data.source === 'simulated-provider'
+        ? 'Quotes are simulated because no live feed is available.'
+        : 'Market data status is shown for the selected exchange.';
+      document.getElementById('indexLabel').textContent = `${exchange.indexName || 'Market Index'}${data.source === 'twelve-data-live' || data.source === 'yahoo-finance-unofficial' ? ' · reference' : ''}`;
+      document.getElementById('nepseIndex').textContent = Number(data.index ?? data.nepseIndex ?? exchange.index ?? 0).toFixed(2);
+      document.getElementById('aiTitle').textContent = exchange.name || 'Selected market';
+      document.getElementById('aiSummary').textContent = data.aiInsight?.summary || 'Index and quote data for the selected exchange.';
+      document.getElementById('aiConfidence').textContent = data.source === 'nepse-live'
+        ? 'NEPSE live'
+        : data.source === 'twelve-data-live'
+          ? 'Provider quotes'
+          : data.source === 'yahoo-finance-unofficial'
+            ? 'Unofficial quotes'
+          : 'Simulated';
       renderMarketTable(data.marketOverview);
-      bindTradeButtons();
-    }
-
-    async function loadMarket() {
-      const data = await fetchJson('/api/market');
-      const stocks = data.stocks || [];
-      const panel = document.getElementById('marketsPanel');
-      
-      if (!stocks || stocks.length === 0) {
-        panel.innerHTML = '<p class="text-slate-500">No stocks available</p>';
-        return;
-      }
-
-      panel.innerHTML = `
-        <div class="bg-white border border-slate-200 rounded-xl overflow-hidden">
-          <div class="p-4 border-b border-slate-200 font-bold text-lg">All NEPSE Stocks (${stocks.length})</div>
-          <div class="overflow-x-auto max-h-[600px]">
-            <table class="w-full text-left text-sm">
-              <thead class="bg-slate-50 text-xs uppercase text-slate-500 sticky top-0">
-                <tr>
-                  <th class="p-3">Symbol</th>
-                  <th class="p-3">Company</th>
-                  <th class="p-3">LTP</th>
-                  <th class="p-3">Change %</th>
-                  <th class="p-3">Volume</th>
-                  <th class="p-3">High</th>
-                  <th class="p-3">Low</th>
-                  <th class="p-3 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                ${stocks.map(stock => `
-                  <tr class="hover:bg-slate-50">
-                    <td class="p-3 font-semibold text-blue-600">${stock.symbol}</td>
-                    <td class="p-3 text-slate-600">${stock.company || stock.symbol}</td>
-                    <td class="p-3 font-mono">${Number(stock.price).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="p-3 font-semibold ${stock.change >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${stock.change >= 0 ? '+' : ''}${stock.change}%</td>
-                    <td class="p-3 text-slate-600">${Number(stock.volume).toLocaleString()}</td>
-                    <td class="p-3 text-slate-600">${Number(stock.high).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="p-3 text-slate-600">${Number(stock.low).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-                    <td class="p-3 text-right"><button class="trade-btn px-3 py-1 rounded bg-blue-50 text-blue-600 text-xs font-medium hover:bg-blue-100" data-symbol="${stock.symbol}">Trade</button></td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `;
-      bindTradeButtons();
-    }
-
-    async function loadPortfolio() {
-      const data = await fetchJson('/api/portfolio');
-      renderPortfolio(data);
+      renderPerformers(data);
     }
 
     async function loadAi() {
-      const data = await fetchJson('/api/market');
+      const data = state.market?.id === state.exchange && Date.now() - state.marketFetchedAt < 30000
+        ? state.market
+        : await fetchJson(`/api/market?exchange=${state.exchange}`);
+      state.market = data;
+      state.marketFetchedAt = Date.now();
       const stocks = data.stocks || [];
       const topStocks = stocks.sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 8);
       renderAi(topStocks);
     }
 
+    async function loadMarket() {
+      const data = state.market?.id === state.exchange && Date.now() - state.marketFetchedAt < 30000
+        ? state.market
+        : await fetchJson(`/api/market?exchange=${state.exchange}`);
+      state.market = data;
+      state.marketFetchedAt = Date.now();
+      document.getElementById('marketsTitle').textContent = `${data.name} · ${data.source === 'nepse-live' || data.source === 'twelve-data-live' || data.source === 'yahoo-finance-unofficial' ? 'Provider data' : 'Simulated data'}`;
+      renderMarkets(data.stocks || []);
+    }
+
+    // Candlestick chart rendering
+    function renderCandlestickChart(canvasId, ohlcData) {
+      const ctx = document.getElementById(canvasId).getContext('2d');
+      
+      if (window[canvasId + '_chart']) {
+        window[canvasId + '_chart'].destroy();
+      }
+
+      const dates = ohlcData.map(d => d.date);
+      const closes = ohlcData.map(d => d.close);
+      const opens = ohlcData.map(d => d.open);
+      const highs = ohlcData.map(d => d.high);
+      const lows = ohlcData.map(d => d.low);
+
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [
+            {
+              label: 'Close',
+              data: closes,
+              borderColor: '#3b82f6',
+              backgroundColor: 'rgba(59, 130, 246, 0.05)',
+              borderWidth: 2,
+              fill: true,
+              tension: 0.3,
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              yAxisID: 'y'
+            },
+            {
+              label: 'High',
+              data: highs,
+              borderColor: '#10b981',
+              borderWidth: 1,
+              borderDash: [5, 5],
+              fill: false,
+              tension: 0.3,
+              pointRadius: 0,
+              yAxisID: 'y'
+            },
+            {
+              label: 'Low',
+              data: lows,
+              borderColor: '#ef4444',
+              borderWidth: 1,
+              borderDash: [5, 5],
+              fill: false,
+              tension: 0.3,
+              pointRadius: 0,
+              yAxisID: 'y'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          interaction: {
+            mode: 'index',
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              display: true,
+              position: 'top',
+              labels: { boxWidth: 12, font: { size: 11 }, padding: 15 }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 8,
+              titleFont: { size: 12 },
+              bodyFont: { size: 11 },
+              cornerRadius: 4,
+              displayColors: true,
+              callbacks: {
+                afterLabel: function(context) {
+                  const idx = context.dataIndex;
+                  if (context.dataset.label === 'Close') {
+                    const ohlc = ohlcData[idx];
+                    return `Open: ${ohlc.open}\nHigh: ${ohlc.high}\nLow: ${ohlc.low}\nVol: ${(ohlc.volume / 1000).toFixed(0)}K`;
+                  }
+                  return '';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              type: 'linear',
+              position: 'left',
+              title: { display: true, text: 'Price (NPR)' },
+              grid: { color: 'rgba(0, 0, 0, 0.05)' }
+            },
+            x: {
+              title: { display: true, text: 'Date' },
+              grid: { display: false },
+              ticks: { maxRotation: 45, minRotation: 0, maxTicksLimit: 10 }
+            }
+          }
+        }
+      });
+
+      window[canvasId + '_chart'] = chart;
+    }
+
+    function formatMarketValue(value, fractionDigits = 0) {
+      if (value === null || value === undefined || !Number.isFinite(Number(value))) return '--';
+      return new Intl.NumberFormat('en-US', { minimumFractionDigits: fractionDigits, maximumFractionDigits: fractionDigits }).format(Number(value));
+    }
+
+    function isMarketOpen(status) {
+      return status?.isOpen === true || String(status?.isOpen || status?.state || status?.status || '').toUpperCase() === 'OPEN';
+    }
+
+    function recordLiveSample(symbol, value, updatedAt, source) {
+      if (source !== 'nepse-live' || !Number.isFinite(Number(value)) || Number(value) <= 0) return [];
+      const timestamp = String(updatedAt || new Date().toISOString());
+      const date = timestamp.slice(0, 10);
+      const minute = timestamp.slice(0, 16);
+      const storageKey = `tradeverse.liveChart.${symbol}.${date}`;
+      let samples = [];
+      try {
+        samples = JSON.parse(localStorage.getItem(storageKey) || '[]');
+      } catch {
+        samples = [];
+      }
+      const sample = { minute, label: minute.slice(11, 16), value: Number(value) };
+      if (samples.at(-1)?.minute === minute) samples[samples.length - 1] = sample;
+      else samples.push(sample);
+      samples = samples.slice(-240);
+      localStorage.setItem(storageKey, JSON.stringify(samples));
+      return samples;
+    }
+
+    function renderLiveSampleChart(canvasId, samples, label, color) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas || typeof Chart === 'undefined') return;
+      const chartKey = `${canvasId}_chart`;
+      window[chartKey]?.destroy();
+      window[chartKey] = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: samples.map(sample => sample.label),
+          datasets: [{
+            label,
+            data: samples.map(sample => sample.value),
+            borderColor: color,
+            backgroundColor: color === '#e5484d' ? 'rgba(229, 72, 77, 0.18)' : 'rgba(38, 132, 255, 0.22)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.25,
+            pointRadius: samples.length > 1 ? 1 : 3,
+            pointHoverRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: context => `${label}: ${formatMarketValue(context.raw, 2)}` } }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 9 } },
+            y: { grid: { color: 'rgba(15, 23, 42, 0.08)' }, ticks: { callback: value => formatMarketValue(value, 0) } }
+          }
+        }
+      });
+    }
+
+    function renderIndexSnapshot(data) {
+      const index = Number(data.index ?? data.nepseIndex ?? 0);
+      const change = Number(data.indexChange || 0);
+      const percent = Number(data.indexChangePercent || 0);
+      const live = data.source === 'nepse-live';
+      const open = live && isMarketOpen(data.marketStatus);
+      const timestamp = data.updatedAt || data.marketStatus?.asOf;
+      document.getElementById('nepseChartTitle').textContent = data.indexName || 'NEPSE Index';
+      document.getElementById('nepseChartValue').textContent = formatMarketValue(index, 2);
+      document.getElementById('nepseChartChange').textContent = `${change >= 0 ? '+' : ''}${formatMarketValue(change, 2)} pts`;
+      document.getElementById('nepseChartPercent').textContent = `${percent >= 0 ? '+' : ''}${formatMarketValue(percent, 2)}%`;
+      document.getElementById('nepseChartChange').className = change >= 0 ? 'text-emerald-600' : 'text-rose-600';
+      document.getElementById('nepseChartPercent').className = change >= 0 ? 'text-emerald-600' : 'text-rose-600';
+      document.getElementById('nepseChartUpdated').textContent = live
+        ? `${open ? 'LIVE' : 'PREVIOUS CLOSE'}${timestamp ? ` · ${timestamp.replace('T', ' ').slice(0, 16)} NST` : ''}`
+        : 'SIMULATED DATA';
+      const stats = data.marketStats || {};
+      document.getElementById('marketTurnover').textContent = stats.turnover == null ? '--' : `Rs ${formatMarketValue(stats.turnover, 2)}`;
+      document.getElementById('marketShares').textContent = stats.sharesTraded == null ? '--' : formatMarketValue(stats.sharesTraded);
+      document.getElementById('marketAdvances').textContent = formatMarketValue(stats.advances);
+      document.getElementById('marketDeclines').textContent = formatMarketValue(stats.declines);
+      document.getElementById('marketUnchanged').textContent = formatMarketValue(stats.unchanged);
+      renderMarketStatus(data.marketStatus);
+      const samples = recordLiveSample('NEPSE', index, timestamp, data.source);
+      renderLiveSampleChart('nepseChart', samples, data.marketDataState === 'LIVE' ? 'Live index' : 'Previous close', change < 0 ? '#e5484d' : '#16876b');
+      document.getElementById('nepseChartMessage').textContent = !live
+        ? 'The live NEPSE feed is unavailable for this deployment.'
+        : open && samples.length < 2
+          ? 'Live samples accumulate while the market is open.'
+          : `${samples.length} observed index sample${samples.length === 1 ? '' : 's'} · high ${formatMarketValue(data.indexHigh, 2)} · low ${formatMarketValue(data.indexLow, 2)}`;
+    }
+
+    function populateStockSearch(stocks) {
+      const datalist = document.getElementById('stockChartSymbols');
+      const holdings = getDemoExchange(readDemoAccount()).holdings;
+      const bySymbol = new Map(stocks.map(stock => [stock.symbol, stock]));
+      holdings.forEach(item => {
+        if (!bySymbol.has(item.symbol)) bySymbol.set(item.symbol, item);
+      });
+      datalist.replaceChildren(...[...bySymbol.values()].map(stock => {
+        const option = document.createElement('option');
+        option.value = stock.symbol;
+        option.label = stock.company || stock.symbol;
+        return option;
+      }));
+    }
+
+    async function refreshChartMarket() {
+      const data = await fetchJson(`/api/market?exchange=${state.exchange}`);
+      state.market = data;
+      state.marketFetchedAt = Date.now();
+      renderIndexSnapshot(data);
+      if (state.selectedChartSymbol) await loadStockDetail(state.selectedChartSymbol, false);
+    }
+
+    async function loadCharts() {
+      try {
+        const data = state.market?.id === state.exchange && Date.now() - state.marketFetchedAt < 30000
+          ? state.market
+          : await fetchJson(`/api/market?exchange=${state.exchange}`);
+        state.market = data;
+        state.marketFetchedAt = Date.now();
+        renderIndexSnapshot(data);
+        populateStockSearch(data.stocks || []);
+        const input = document.getElementById('stockChartSearch');
+        const firstSymbol = (data.stocks || []).some(stock => stock.symbol === 'NABIL') ? 'NABIL' : data.stocks?.[0]?.symbol;
+        if (!input.value || !data.stocks?.some(stock => stock.symbol === input.value)) input.value = firstSymbol || '';
+        if (input.value) await loadStockDetail(input.value, false);
+        if (state.chartTimer) clearInterval(state.chartTimer);
+        if (data.source === 'nepse-live' && isMarketOpen(data.marketStatus)) {
+          state.chartTimer = setInterval(() => refreshChartMarket().catch(error => console.error('Live chart refresh failed:', error)), 60000);
+        }
+      } catch (error) {
+        console.error('Error loading chart data:', error);
+        document.getElementById('nepseChartMessage').textContent = `Unable to load market data: ${error.message}`;
+      }
+    }
+
+    async function loadStockDetail(symbol, scroll = true) {
+      try {
+        const normalizedSymbol = String(symbol || '').trim().toUpperCase();
+        if (!normalizedSymbol) return;
+        if (state.exchange !== 'nepse') {
+          const stockData = await fetchJson(`/api/history/${normalizedSymbol}?days=180&exchange=${state.exchange}`);
+          document.getElementById('detailedChartTitle').textContent = `${normalizedSymbol} - ${stockData.company}`;
+          document.getElementById('detailedChartTradingDate').textContent = `${stockData.dataSource === 'twelve-data-daily' ? 'Twelve Data daily bars' : 'Simulated history'} · as of ${stockData.history.at(-1)?.date || stockData.tradingStartDate}`;
+          document.getElementById('detailedPrice').textContent = formatMarketValue(stockData.currentPrice, 2);
+          document.getElementById('detailedChange').textContent = `${stockData.currentChange >= 0 ? '+' : ''}${stockData.currentChange.toFixed(2)}%`;
+          document.getElementById('detailedHigh').textContent = formatMarketValue(Math.max(...stockData.history.map(item => item.high)), 2);
+          document.getElementById('detailedLow').textContent = formatMarketValue(Math.min(...stockData.history.map(item => item.low)), 2);
+          document.getElementById('stockChartHeading').textContent = 'Simulated price history';
+          document.getElementById('selectedStockChart').classList.remove('hidden');
+          renderCandlestickChart('detailedChart', stockData.history);
+          return;
+        }
+
+        let stock = state.market?.stocks?.find(item => item.symbol === normalizedSymbol);
+        if (!stock) {
+          state.market = await fetchJson('/api/market?exchange=nepse');
+          stock = state.market.stocks?.find(item => item.symbol === normalizedSymbol);
+          populateStockSearch(state.market.stocks || []);
+        }
+        if (!stock) throw new Error(`No current NEPSE quote is available for ${normalizedSymbol}.`);
+        state.selectedChartSymbol = normalizedSymbol;
+        document.getElementById('stockChartSearch').value = normalizedSymbol;
+        document.getElementById('detailedChartTitle').textContent = `${normalizedSymbol} - ${stock.company || normalizedSymbol}`;
+        document.getElementById('detailedChartTradingDate').textContent = `${state.market.marketDataState || 'NEPSE'} · ${state.market.updatedAt || ''}`;
+        document.getElementById('detailedPrice').textContent = formatMarketValue(stock.price, 2);
+        document.getElementById('detailedChange').textContent = `${stock.change >= 0 ? '+' : ''}${formatMarketValue(stock.change, 2)}%`;
+        document.getElementById('detailedHigh').textContent = formatMarketValue(stock.high, 2);
+        document.getElementById('detailedLow').textContent = formatMarketValue(stock.low, 2);
+        document.getElementById('stockChartHeading').textContent = `Observed ${normalizedSymbol} price samples`;
+        document.getElementById('selectedStockChart').classList.remove('hidden');
+        const samples = recordLiveSample(normalizedSymbol, stock.price, state.market.updatedAt, state.market.source);
+        renderLiveSampleChart('detailedChart', samples, normalizedSymbol, Number(stock.change) < 0 ? '#e5484d' : '#16876b');
+        if (scroll) setTimeout(() => document.getElementById('selectedStockChart').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+      } catch (error) {
+        console.error('Error loading stock detail:', error);
+        alert(error.message);
+      }
+    }
+
     document.querySelectorAll('.nav-btn').forEach(btn => {
       btn.addEventListener('click', async () => {
         const view = btn.dataset.view;
+        if (state.chartTimer && view !== 'charts') clearInterval(state.chartTimer);
         state.view = view;
         showView(view);
         if (view === 'dashboard') await loadDashboard();
         if (view === 'markets') await loadMarket();
+        if (view === 'charts') await loadCharts();
         if (view === 'portfolio') await loadPortfolio();
         if (view === 'ai') await loadAi();
       });
     });
 
+    document.querySelectorAll('.performer-tab').forEach(button => {
+      button.addEventListener('click', () => {
+        const group = button.dataset.performerGroup;
+        document.querySelectorAll(`.performer-tab[data-performer-group="${group}"]`).forEach(tab => {
+          const active = tab === button;
+          tab.setAttribute('aria-selected', String(active));
+          tab.classList.toggle('bg-blue-500', active);
+          tab.classList.toggle('text-white', active);
+          tab.classList.toggle('font-semibold', active);
+          tab.classList.toggle('bg-slate-100', !active);
+          tab.classList.toggle('text-slate-600', !active);
+        });
+        state.expandedPerformerGroups.delete(group);
+        renderPerformerGroup(group);
+      });
+    });
+
+    document.querySelectorAll('.performer-more').forEach(button => {
+      button.addEventListener('click', () => {
+        const group = button.dataset.performerMore;
+        if (state.expandedPerformerGroups.has(group)) state.expandedPerformerGroups.delete(group);
+        else state.expandedPerformerGroups.add(group);
+        renderPerformerGroup(group);
+      });
+    });
+
+    document.getElementById('exchangeSelector').addEventListener('change', async (event) => {
+      state.exchange = event.target.value;
+      try {
+        await loadDashboard();
+        if (state.view === 'markets') await loadMarket();
+        if (state.view === 'charts') await loadCharts();
+        if (state.view === 'ai') await loadAi();
+        if (state.view === 'portfolio') await loadPortfolio();
+      } catch (error) {
+        console.error('Unable to switch exchange:', error.message);
+      }
+    });
+
+    document.getElementById('refreshMarketBtn').addEventListener('click', async () => {
+      const button = document.getElementById('refreshMarketBtn');
+      button.disabled = true;
+      try {
+        await loadDashboard();
+        if (state.view === 'markets') await loadMarket();
+        if (state.view === 'charts') await loadCharts();
+        if (state.view === 'ai') await loadAi();
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        button.disabled = false;
+      }
+    });
+
+    document.getElementById('loadStockChart').addEventListener('click', () => loadStockDetail(document.getElementById('stockChartSearch').value));
+    document.getElementById('stockChartSearch').addEventListener('keydown', event => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        loadStockDetail(event.currentTarget.value);
+      }
+    });
+
     document.getElementById('quickTradeBtn').addEventListener('click', () => {
-      document.getElementById('tradeSymbol').value = 'NABIL';
+      const stock = state.market?.stocks?.[0];
+      if (!stock) {
+        alert('No quote is available to trade for this exchange.');
+        return;
+      }
+      document.getElementById('tradeSymbol').value = stock.symbol;
+      state.currentPrice = Number(stock?.price || 0);
+      updateTradeTotal();
       document.getElementById('tradeModal').classList.remove('hidden');
       document.getElementById('tradeModal').classList.add('flex');
     });
+
+    async function openWorkspace(email) {
+      state.csrfToken = null;
+      state.user = { email };
+      document.getElementById('signedInUser').textContent = email;
+      document.getElementById('signedInUser').classList.remove('hidden');
+      document.getElementById('authMessage').classList.add('hidden');
+      document.getElementById('loginModal').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      await loadDashboard();
+      showView('dashboard');
+    }
+
+    async function authenticate(action) {
+      const message = document.getElementById('authMessage');
+      const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const password = document.getElementById('loginPassword').value;
+      const button = document.getElementById(action === 'login' ? 'loginBtn' : 'signupBtn');
+      button.disabled = true;
+      message.classList.add('hidden');
+      try {
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Enter a valid email address.');
+        if (!password) throw new Error('Enter a password to continue.');
+        if (password.length > 128) throw new Error('Password must be 128 characters or fewer.');
+        localStorage.setItem(DEMO_USER_KEY, email);
+        document.getElementById('loginPassword').value = '';
+        await openWorkspace(email);
+      } catch (error) {
+        message.textContent = error.message;
+        message.classList.remove('hidden');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    document.getElementById('loginBtn').addEventListener('click', () => authenticate('login'));
+    document.getElementById('signupBtn').addEventListener('click', () => authenticate('signup'));
+    document.getElementById('loginPassword').addEventListener('keydown', event => {
+      if (event.key === 'Enter') document.getElementById('loginBtn').click();
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      try {
+        localStorage.removeItem(DEMO_USER_KEY);
+      } catch (error) {
+        alert(`Sign-out failed: ${error.message}`);
+        return;
+      }
+      state.csrfToken = null;
+      state.user = null;
+      state.portfolio = null;
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('loginModal').classList.remove('hidden');
+      document.getElementById('signedInUser').classList.add('hidden');
+    });
+
+    async function initializeSession() {
+      try {
+        const email = localStorage.getItem(DEMO_USER_KEY);
+        if (email) await openWorkspace(email);
+      } catch (error) {
+        const message = document.getElementById('authMessage');
+        message.textContent = error.message;
+        message.classList.remove('hidden');
+      }
+    }
 
     document.getElementById('closeTradeModal').addEventListener('click', () => {
       document.getElementById('tradeModal').classList.add('hidden');
@@ -427,27 +1279,86 @@
     document.getElementById('tradeForm').addEventListener('submit', async (event) => {
       event.preventDefault();
       const payload = {
+        exchange: state.exchange,
         symbol: document.getElementById('tradeSymbol').value,
         side: document.getElementById('tradeSide').value,
-        quantity: Number(document.getElementById('tradeQty').value || 0),
-        price: 1245.5
+        quantity: Number(document.getElementById('tradeQty').value || 0)
       };
 
-      const result = await fetch('/api/trade', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).then(res => res.json());
-
-      alert(result.message || 'Trade submitted.');
-      document.getElementById('tradeModal').classList.add('hidden');
-      document.getElementById('tradeModal').classList.remove('flex');
+      try {
+        if (!state.market) throw new Error('Load market quotes before placing a paper order.');
+        if (!Number.isSafeInteger(payload.quantity) || payload.quantity < 1 || payload.quantity > 1000000) {
+          throw new Error('Enter a whole-share quantity between 1 and 1,000,000.');
+        }
+        const symbol = payload.symbol.trim().toUpperCase();
+        const quote = state.market.stocks.find(stock => String(stock.symbol).toUpperCase() === symbol);
+        if (!quote || !Number.isFinite(Number(quote.price)) || Number(quote.price) <= 0) {
+          throw new Error('This symbol has no valid quote on the selected exchange.');
+        }
+        const price = Number(quote.price);
+        const total = Number((price * payload.quantity).toFixed(4));
+        const account = readDemoAccount();
+        const exchangePortfolio = getDemoExchange(account);
+        const holdings = exchangePortfolio.holdings;
+        const holding = holdings.find(item => item.symbol === symbol);
+        if (payload.side === 'BUY') {
+          if (exchangePortfolio.cashBalance < total) throw new Error('Not enough virtual cash for this order.');
+          if (holding) {
+            const newUnits = Number(holding.units) + payload.quantity;
+            holding.avgCost = (Number(holding.units) * Number(holding.avgCost) + total) / newUnits;
+            holding.units = newUnits;
+            holding.currentPrice = price;
+          } else {
+            holdings.push({ symbol, units: payload.quantity, avgCost: price, currentPrice: price });
+          }
+          exchangePortfolio.cashBalance = Number((exchangePortfolio.cashBalance - total).toFixed(4));
+        } else {
+          if (!holding || Number(holding.units) < payload.quantity) throw new Error('You do not have enough shares to sell.');
+          holding.units = Number(holding.units) - payload.quantity;
+          holding.currentPrice = price;
+          if (holding.units === 0) holdings.splice(holdings.indexOf(holding), 1);
+          exchangePortfolio.cashBalance = Number((exchangePortfolio.cashBalance + total).toFixed(4));
+        }
+        const trade = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+          exchange: state.exchange,
+          symbol,
+          side: payload.side,
+          quantity: payload.quantity,
+          price,
+          estimatedPrice: price,
+          total,
+          status: 'simulated',
+          timestamp: new Date().toISOString()
+        };
+        exchangePortfolio.orders = [trade, ...exchangePortfolio.orders].slice(0, 50);
+        writeDemoAccount(account);
+        const result = { trade, portfolio: exchangePortfolio };
+        state.portfolio = calculatePortfolio(result.portfolio);
+        document.getElementById('portfolioValue').textContent = formatMoney(state.portfolio.totalNetWorth);
+        document.getElementById('buyingPower').textContent = formatMoney(state.portfolio.cashBalance);
+        document.getElementById('availableCash').textContent = formatMoney(state.portfolio.cashBalance);
+        if (state.view === 'portfolio') await loadPortfolio();
+        alert(`${result.trade.side} ${result.trade.quantity} ${result.trade.symbol} paper order recorded at ${formatPrice(result.trade.estimatedPrice)}.`);
+        document.getElementById('tradeModal').classList.add('hidden');
+        document.getElementById('tradeModal').classList.remove('flex');
+      } catch (error) {
+        alert(error.message);
+      }
     });
 
-    loadDashboard();
-    showView('dashboard');
+    initializeSession();
     updateTradeTotal();
-    lucide.createIcons();
+    
+    // Initialize close button for detailed chart
+    const closeDetailedChartBtn = document.getElementById('closeDetailedChart');
+    if (closeDetailedChartBtn) {
+      closeDetailedChartBtn.addEventListener('click', () => {
+        document.getElementById('selectedStockChart').classList.add('hidden');
+      });
+    }
+    
+    if (window.lucide) window.lucide.createIcons();
   </script>
 </body>
 </html>

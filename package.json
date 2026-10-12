@@ -17,8 +17,8 @@
   "author": "TradeVerse AI Team",
   "license": "MIT",
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "helmet": "^8.3.0"
   }
 }

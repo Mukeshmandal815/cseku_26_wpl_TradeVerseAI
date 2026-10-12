@@ -1,0 +1,8 @@
+{
+  "appId": "com.tradeverseai.mobile",
+  "appName": "TradeVerseAI Mobile",
+  "webDir": "../public",
+  "server": {
+    "url": "https://trade-verse-ai.vercel.app"
+  }
+}

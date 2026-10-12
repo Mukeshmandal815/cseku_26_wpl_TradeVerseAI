@@ -16,10 +16,6 @@ from functools import lru_cache
 import asyncio
 import aiohttp
 import websockets
-import urllib3
-
-# Suppress SSL warnings
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 class CacheManager:
     """Simple caching layer to avoid repeated API calls"""
@@ -147,7 +143,6 @@ class Nepse:
         self.token_timestamp = 0
         
         # Configure session
-        self.session.verify = False
         self.session.headers.update({
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36",
             "Content-Type": "application/json",
@@ -1022,7 +1017,7 @@ class AsyncNepse:
     async def authenticate(self):
         """Async authentication"""
         url = f"{self.BASE_URL}/api/authenticate/prove"
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 data = await response.json()
                 self.access_token, _, self.salts = \
@@ -1033,7 +1028,7 @@ class AsyncNepse:
         if not self.access_token: await self.authenticate()
         url = f"{self.BASE_URL}/api/nots/nepse-data/market-open"
         headers = {"Authorization": f"Salter {self.access_token}"}
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
                 return await response.json()
 
@@ -1042,7 +1037,7 @@ class AsyncNepse:
         if not self.access_token: await self.authenticate()
         url = f"{self.BASE_URL}/api/nots/market-summary/"
         headers = {"Authorization": f"Salter {self.access_token}"}
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
                 return await response.json()
 
@@ -1051,7 +1046,7 @@ class AsyncNepse:
         if not self.access_token: await self.authenticate()
         url = f"{self.BASE_URL}/api/nots/nepse-index"
         headers = {"Authorization": f"Salter {self.access_token}"}
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
                 return await response.json()
 
@@ -1060,7 +1055,7 @@ class AsyncNepse:
         if not self.access_token: await self.authenticate()
         url = f"{self.BASE_URL}/api/nots"
         headers = {"Authorization": f"Salter {self.access_token}"}
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
                 return await response.json()
 
@@ -1078,7 +1073,7 @@ class AsyncNepse:
         all_promoters = []
         current_page = 0
         
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             try:
                 while True:
                     url = f"{endpoint}?size=500&page={current_page}"
@@ -1111,7 +1106,7 @@ class AsyncNepse:
         headers = {"Authorization": f"Salter {self.access_token}", "Content-Type": "application/json"}
         # For today-price, we need a POST request with payload
         payload = {"id": 1} # Dummy ID often works for simple today-price
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             async with session.post(url, headers=headers, json=payload) as response:
                 return await response.json()
 
@@ -1120,7 +1115,7 @@ class AsyncNepse:
         if not self.access_token: await self.authenticate()
         url = f"{self.BASE_URL}/api/nots/lives-market"
         headers = {"Authorization": f"Salter {self.access_token}"}
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
                 return await response.json()
 
@@ -1152,7 +1147,7 @@ class AsyncNepse:
         if not self.access_token: await self.authenticate()
         url = f"{self.BASE_URL}/api/nots/top-ten/top-gainer"
         headers = {"Authorization": f"Salter {self.access_token}"}
-        async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False)) as session:
+        async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
                 return await response.json()
 
@@ -1167,4 +1162,3 @@ def quick_top_gainers(limit=5):
     """Quick helper to get top gainers"""
     nepse = Nepse()
     return nepse.get_top_gainers(limit=limit)
-

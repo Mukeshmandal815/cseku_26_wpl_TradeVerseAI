@@ -1,31 +1,39 @@
 #!/usr/bin/env python3
 import json
 import sys
+import contextlib
 from datetime import datetime, timedelta
+from pathlib import Path
 
-PROJECT_ROOT = "D:/4th yr 2nd term/Web Programming & Mobile App Dev Project"
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
+PROJECT_ROOT = Path(__file__).resolve().parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
-from TradeVerseAI.market import Nepse
+from market import Nepse
 
 
 def normalize_stock(item):
-    price = item.get('lastTradedPrice') or item.get('openPrice') or item.get('averageTradedPrice') or 0
+    price = float(item.get('lastTradedPrice') or item.get('ltp') or item.get('closingPrice') or item.get('closePrice') or item.get('close') or item.get('openPrice') or item.get('averageTradedPrice') or 0)
+    previous_close = float(item.get('previousClose') or item.get('cp') or item.get('close') or price)
     change = item.get('percentageChange') or 0
     return {
         'symbol': item.get('symbol', ''),
         'company': item.get('securityName') or item.get('symbol', ''),
         'sector': item.get('sector') or 'NEPSE',
-        'price': float(price),
+        'price': price,
         'change': float(change),
-        'volume': int(item.get('totalTradeQuantity') or item.get('lastTradedVolume') or 0),
-        'high': float(item.get('highPrice') or price),
-        'low': float(item.get('lowPrice') or price),
+        'pointChange': float(item.get('pointChange') if item.get('pointChange') is not None else price - previous_close),
+        'volume': int(item.get('totalTradeQuantity') or item.get('shareTraded') or item.get('lastTradedVolume') or 0),
+        'turnover': float(item.get('totalTradeValue') or item.get('turnover') or 0),
+        'transactions': int(item.get('totalTrades') or item.get('totalTransaction') or item.get('transactions') or 0),
+        'buyQuantity': item.get('topBuyQuantity') or item.get('totalBuyQuantity') or item.get('buyQuantity'),
+        'buyOrders': item.get('buyOrders') or item.get('totalBuyOrders') or item.get('buyOrderCount'),
+        'sellQuantity': item.get('topSellQuantity') or item.get('totalSellQuantity') or item.get('sellQuantity'),
+        'sellOrders': item.get('sellOrders') or item.get('totalSellOrders') or item.get('sellOrderCount'),
+        'high': float(item.get('highPrice') or item.get('high') or price),
+        'low': float(item.get('lowPrice') or item.get('low') or price),
         'open': float(item.get('openPrice') or price),
-        'close': float(item.get('previousClose') or price),
-        'signal': 'Bullish' if float(change) >= 0 else 'Bearish',
-        'confidence': max(45, min(95, int(abs(float(change)) * 30 + 50))),
+        'close': previous_close,
         'securityId': item.get('securityId'),
         'lastUpdated': item.get('lastUpdatedDateTime')
     }
@@ -36,8 +44,10 @@ def fetch_dashboard_payload():
     market_status = nepse.get_market_status()
     index_payload = nepse.get_nepse_index()
     stock_rows = nepse.get_stocks()
-    top_gainers = nepse.get_top_gainers(limit=5)
-    top_losers = nepse.get_top_losers(limit=5)
+    if not stock_rows:
+        stock_rows = nepse.get_price_volume()
+    market_summary = nepse.get_market_summary()
+    transaction_rows = nepse.get_top_transaction()
 
     nepse_index = {}
     if isinstance(index_payload, list) and index_payload:
@@ -45,20 +55,51 @@ def fetch_dashboard_payload():
     elif isinstance(index_payload, dict):
         nepse_index = index_payload
 
-    # Return ALL stocks, not just 30
-    normalized = [normalize_stock(item) for item in stock_rows]
+    normalized = [normalize_stock(item) for item in stock_rows if item.get('symbol')]
+    advances = sum(stock['change'] > 0 for stock in normalized)
+    declines = sum(stock['change'] < 0 for stock in normalized)
+    unchanged = sum(stock['change'] == 0 for stock in normalized)
+
+    def summary_value(detail):
+        row = next((item for item in market_summary if item.get('detail') == detail), None)
+        return float(row.get('value') or 0) if row else 0
+
+    top_gainers = sorted(normalized, key=lambda stock: stock['change'], reverse=True)[:10]
+    top_losers = sorted(normalized, key=lambda stock: stock['change'])[:10]
+    top_transactions = [normalize_stock(item) for item in transaction_rows if item.get('symbol')]
+    latest_index = float(nepse_index.get('currentValue') or nepse_index.get('close') or 0)
+    index_change = float(nepse_index.get('change') or 0)
+    market_is_open = str(market_status.get('isOpen', '')).upper() in ('OPEN', 'TRUE')
+    market_data_as_of = nepse_index.get('generatedTime') if market_is_open else market_status.get('asOf')
 
     return {
         'greeting': 'Good morning, Trader',
         'virtualBuyingPower': 682400,
         'portfolioValue': 1249100,
         'availableCash': 682400,
-        'nepseIndex': float(nepse_index.get('currentValue') or nepse_index.get('close') or 0),
-        'indexChange': float(nepse_index.get('change') or 0),
+        'nepseIndex': latest_index,
+        'indexChange': index_change,
+        'indexChangePercent': float(nepse_index.get('perChange') or 0),
+        'indexHigh': float(nepse_index.get('high') or 0),
+        'indexLow': float(nepse_index.get('low') or 0),
+        'previousClose': float(nepse_index.get('previousClose') or 0),
+        'marketDataState': 'LIVE' if market_is_open else 'PREVIOUS CLOSE',
+        'updatedAt': market_data_as_of or nepse_index.get('generatedTime'),
+        'marketStats': {
+            'turnover': summary_value('Total Turnover Rs:'),
+            'sharesTraded': int(summary_value('Total Traded Shares')),
+            'transactions': int(summary_value('Total Transactions')),
+            'scripsTraded': int(summary_value('Total Scrips Traded')),
+            'marketCapitalization': summary_value('Total Market Capitalization Rs:'),
+            'advances': advances if normalized else None,
+            'declines': declines if normalized else None,
+            'unchanged': unchanged if normalized else None
+        },
         'marketOverview': normalized,
         'marketStatus': market_status,
         'topGainers': top_gainers,
         'topLosers': top_losers,
+        'topTransactions': top_transactions,
         'aiInsight': {
             'title': 'Live NEPSE Momentum',
             'summary': 'Market sentiment is updated from the latest NEPSE live feed and top-performing sectors.',
@@ -75,9 +116,17 @@ def fetch_market_payload():
         'marketStatus': payload.get('marketStatus'),
         'nepseIndex': payload.get('nepseIndex'),
         'indexChange': payload.get('indexChange'),
+        'indexChangePercent': payload.get('indexChangePercent'),
+        'indexHigh': payload.get('indexHigh'),
+        'indexLow': payload.get('indexLow'),
+        'previousClose': payload.get('previousClose'),
+        'marketDataState': payload.get('marketDataState'),
+        'updatedAt': payload.get('updatedAt'),
+        'marketStats': payload.get('marketStats'),
         'stocks': payload.get('marketOverview'),
         'topGainers': payload.get('topGainers'),
-        'topLosers': payload.get('topLosers')
+        'topLosers': payload.get('topLosers'),
+        'topTransactions': payload.get('topTransactions')
     }
 
 
@@ -152,12 +201,13 @@ def main():
     action = sys.argv[1] if len(sys.argv) > 1 else 'market'
     symbol = sys.argv[2] if len(sys.argv) > 2 else None
 
-    if action == 'dashboard':
-        result = fetch_dashboard_payload()
-    elif action == 'stock':
-        result = fetch_stock_detail(symbol)
-    else:
-        result = fetch_market_payload()
+    with contextlib.redirect_stdout(sys.stderr):
+        if action == 'dashboard':
+            result = fetch_dashboard_payload()
+        elif action == 'stock':
+            result = fetch_stock_detail(symbol)
+        else:
+            result = fetch_market_payload()
 
     print(json.dumps(result, ensure_ascii=False))
 

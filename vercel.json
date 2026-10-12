@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "server.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": "public/**"
+      }
+    },
+    {
+      "src": "api/nepse.py",
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": "{market.py,live_nepse_adapter.py,css.wasm}"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/nepse",
+      "dest": "api/nepse.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "server.js"
+    }
+  ]
+}

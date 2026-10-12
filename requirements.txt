@@ -1,0 +1,4 @@
+aiohttp>=3.9,<4
+pywasm>=2.2,<3
+requests>=2.31,<3
+websockets>=12,<16
