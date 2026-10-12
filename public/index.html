@@ -25,34 +25,67 @@
   </script>
 </head>
 <body class="bg-slate-50 text-slate-800 min-h-screen">
-  <!-- Login/Signin Modal -->
-  <div id="loginModal" class="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-    <div class="bg-white rounded-2xl w-full max-w-md p-8 shadow-2xl">
-      <div class="text-center mb-8">
-        <div class="w-16 h-16 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-2xl text-white mx-auto mb-4">T</div>
-        <h1 class="text-3xl font-bold">TradeVerse <span class="text-blue-600">AI</span></h1>
-        <p class="text-slate-500 text-sm mt-2">Global markets. One research workspace.</p>
-      </div>
-
-      <div class="space-y-4">
-        <input type="email" id="loginEmail" autocomplete="email" placeholder="Email address" class="w-full border border-slate-300 rounded-lg p-3 text-sm placeholder-slate-400" />
-        <input type="password" id="loginPassword" autocomplete="current-password" placeholder="Enter any password to continue" class="w-full border border-slate-300 rounded-lg p-3 text-sm placeholder-slate-400" />
-        <p id="authMessage" role="alert" aria-live="polite" class="hidden text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-3"></p>
-        <button id="loginBtn" class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition">Sign In</button>
-      </div>
-
-      <div class="relative my-6">
-        <div class="absolute inset-0 flex items-center">
-          <div class="w-full border-t border-slate-200"></div>
+  <!-- Login screen -->
+  <div id="loginModal" class="fixed inset-0 overflow-y-auto bg-white z-50">
+    <div class="min-h-full grid grid-cols-1 lg:grid-cols-2">
+      <section class="flex flex-col justify-between bg-slate-50 border-r border-slate-200 px-7 py-8 sm:px-12 lg:px-16">
+        <div>
+          <div class="flex items-center gap-3 mb-14">
+            <div class="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center font-bold text-xl text-white">T</div>
+            <div class="text-xl font-bold">TradeVerse <span class="text-blue-600">AI</span></div>
+          </div>
+          <h1 class="text-4xl sm:text-5xl font-bold tracking-tight text-slate-900 max-w-xl">Trade the markets<br />you <span class="text-blue-600">love.</span></h1>
+          <p class="text-sm font-semibold text-blue-700 mt-3">A Global Market Research and Paper-Trading Workspace</p>
+          <p class="text-slate-500 text-lg leading-relaxed mt-5 max-w-xl">Practice risk-free across ten global exchanges with market data, virtual cash, and a portfolio that tracks your paper trades.</p>
+          <div class="flex flex-wrap gap-2 mt-8 max-w-2xl">
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟢 NEPSE · Nepal</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟢 NYSE · New York</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟢 NASDAQ · United States</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟠 DSE · Dhaka</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟠 SSE · Shanghai</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟠 HKEX · Hong Kong</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟠 NSE · India</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟠 LSE · London</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟠 TSE · Tokyo</span>
+            <span class="rounded-full bg-white border border-slate-200 px-4 py-2 text-sm">🟠 ASX · Australia</span>
+          </div>
+          <div class="mt-9 max-w-xl bg-white border border-slate-200 rounded-2xl p-6">
+            <div class="flex justify-between items-center">
+              <div><p id="loginIndexName" class="text-sm text-slate-500">NEPSE Index</p><p id="loginIndexValue" class="text-3xl font-bold mt-2">Market data</p></div>
+              <span id="loginIndexChange" class="font-semibold text-emerald-600">Paper trading</span>
+            </div>
+            <div class="flex items-end gap-2 h-14 mt-5" aria-hidden="true">
+              <span class="w-3 h-6 bg-slate-300 rounded-sm"></span><span class="w-3 h-9 bg-slate-300 rounded-sm"></span><span class="w-3 h-5 bg-slate-300 rounded-sm"></span><span class="w-3 h-11 bg-blue-500 rounded-sm"></span><span class="w-3 h-14 bg-blue-600 rounded-sm"></span>
+            </div>
+          </div>
         </div>
-        <div class="relative flex justify-center text-sm">
-          <span class="px-2 bg-white text-slate-500">or</span>
+        <div class="mt-12 text-xs leading-relaxed text-slate-500">
+          <p class="font-semibold text-slate-700">Web Programming and Mobile Application Development Project</p>
+          <p class="mt-2">Nuzhat Liana (ID: 202205) &nbsp; | &nbsp; Mukesh Kumar Mandal (ID: 202242)</p>
+          <p><a href="mailto:liana220205@cseku.ac.bd" class="hover:text-blue-600">liana220205@cseku.ac.bd</a> &nbsp; · &nbsp; <a href="mailto:mukesh220242@cseku.ac.bd" class="hover:text-blue-600">mukesh220242@cseku.ac.bd</a></p>
+          <p>Supervisor: Dr. Kazi Masudul Alam, Professor</p>
+          <p>Computer Science and Engineering Discipline, Khulna University</p>
         </div>
-      </div>
+      </section>
 
-      <button id="signupBtn" class="w-full border-2 border-blue-600 text-blue-600 font-semibold py-3 rounded-lg hover:bg-blue-50 transition">Continue in Demo Mode</button>
-
-      <p class="text-center text-xs text-slate-500 mt-6">Demo access only. Email and password are not verified. Demo portfolio data stays in this browser and is not secure or synced.</p>
+      <section class="flex items-center justify-center px-6 py-12 sm:px-12">
+        <div class="w-full max-w-md">
+          <div class="text-center mb-9">
+            <h2 class="text-3xl font-bold text-slate-900">Log in to TradeVerse AI</h2>
+            <p class="text-slate-500 mt-3">Paper trading across NEPSE, NYSE, NASDAQ &amp; more.</p>
+          </div>
+          <form id="loginForm" class="space-y-5">
+            <div><label for="loginEmail" class="block text-sm font-medium mb-2">Email or username</label><input type="text" id="loginEmail" autocomplete="username" required placeholder="Email address or username" class="w-full border border-slate-300 rounded-xl px-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+            <div><label for="loginPassword" class="block text-sm font-medium mb-2">Password</label><input type="password" id="loginPassword" autocomplete="current-password" required placeholder="Password" class="w-full border border-slate-300 rounded-xl px-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-blue-500" /></div>
+            <p id="authMessage" role="alert" aria-live="polite" class="hidden text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-lg p-3"></p>
+            <button id="loginBtn" type="submit" class="w-full bg-blue-600 text-white font-semibold py-3.5 rounded-xl hover:bg-blue-700 transition">Log in</button>
+          </form>
+          <button id="forgotPasswordBtn" type="button" class="block mx-auto mt-5 text-blue-700 hover:underline text-sm">Forgotten password?</button>
+          <div class="border-t border-slate-200 mt-7 pt-7"><button id="signupBtn" class="w-full border border-blue-600 text-blue-600 font-semibold py-3.5 rounded-xl hover:bg-blue-50 transition">Create new account</button></div>
+          <p class="text-center text-xs text-slate-400 mt-8">Educational paper-trading demo · Not financial advice</p>
+          <p class="text-center text-[11px] text-slate-400 mt-2">Demo login accepts any valid email and a non-empty password.</p>
+        </div>
+      </section>
     </div>
   </div>
 
@@ -231,7 +264,7 @@
           <p class="text-slate-500 text-sm mb-6">Click on any stock to view detailed candlestick chart and price history</p>
           
           <div class="space-y-6">
-            <!-- NEPSE Index Chart -->
+            <!-- Selected exchange index chart -->
             <div class="bg-white rounded-xl border border-slate-200 p-5">
               <div class="flex justify-between items-center mb-4">
                 <div>
@@ -250,8 +283,19 @@
                   <div><p class="text-xs text-slate-500">Declined</p><p id="marketDeclines" class="font-mono font-semibold text-rose-600">--</p></div>
                   <div><p class="text-xs text-slate-500">Unchanged</p><p id="marketUnchanged" class="font-mono font-semibold">--</p></div>
                 </div>
-              <canvas id="nepseChart" height="80"></canvas>
+              <div class="flex justify-end gap-2 mb-2">
+                <button type="button" data-chart-zoom-out="nepseChart" aria-label="Zoom out on index chart" class="rounded border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50">−</button>
+                <button type="button" data-chart-zoom-in="nepseChart" aria-label="Zoom in on index chart" class="rounded border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50">+</button>
+                <button type="button" data-chart-reset="nepseChart" class="rounded border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">Reset view</button>
+              </div>
+              <canvas id="nepseChart" height="100"></canvas>
+              <div class="mt-3 px-1">
+                <div class="flex items-center justify-between text-xs text-slate-500 mb-1"><label for="nepseChartRange">Visible date range</label><span id="nepseChartRangeLabel">Recent sessions</span></div>
+                <input id="nepseChartRange" data-chart-range="nepseChart" type="range" min="0" max="0" value="0" step="1" aria-label="Scroll through index chart history" class="w-full accent-blue-600 cursor-pointer" />
+                <div class="flex justify-between text-[10px] text-slate-400"><span>Older</span><span>Newer</span></div>
+              </div>
                 <p id="nepseChartMessage" class="text-xs text-slate-500 mt-2"></p>
+              <p class="text-[11px] text-slate-400 mt-1">Drag to pan · scroll or use +/− to zoom · move over a candle to track OHLC and volume.</p>
             </div>
 
             <!-- Stock Selector Grid -->
@@ -335,28 +379,46 @@
                 <button id="closeDetailedChart" class="text-slate-400 hover:text-slate-600 text-2xl">✕</button>
               </div>
               
-              <div class="grid grid-cols-4 gap-3 mb-6 pb-6 border-b border-slate-200">
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4 pb-5 border-b border-slate-200">
                 <div>
                   <p class="text-xs uppercase text-slate-500">Current Price</p>
                   <p id="detailedPrice" class="text-2xl font-bold font-mono">0.00</p>
                 </div>
                 <div>
-                  <p class="text-xs uppercase text-slate-500">Change %</p>
-                  <p id="detailedChange" class="text-2xl font-bold font-mono">0.00%</p>
+                  <p class="text-xs uppercase text-slate-500">Stock Change</p>
+                  <p id="detailedChange" class="text-xl font-bold font-mono">0.00 pts · 0.00%</p>
                 </div>
                 <div>
-                  <p class="text-xs uppercase text-slate-500">Session High</p>
-                  <p id="detailedHigh" class="text-2xl font-bold font-mono">0.00</p>
+                  <p class="text-xs uppercase text-slate-500">Selected Index</p>
+                  <p id="detailedIndex" class="text-lg font-bold font-mono">--</p>
                 </div>
                 <div>
-                  <p class="text-xs uppercase text-slate-500">Session Low</p>
-                  <p id="detailedLow" class="text-2xl font-bold font-mono">0.00</p>
+                  <p class="text-xs uppercase text-slate-500">Index Change</p>
+                  <p id="detailedIndexChange" class="text-lg font-bold font-mono">--</p>
                 </div>
+                <div><p class="text-xs uppercase text-slate-500">Session High / Low</p><p id="detailedHighLow" class="font-mono">-- / --</p></div>
+                <div><p class="text-xs uppercase text-slate-500">Open / Volume</p><p id="detailedOpenVolume" class="font-mono">--</p></div>
+              </div>
+
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                <p id="detailedSector" class="text-sm text-slate-500">Sector: --</p>
+                <button id="detailTradeBtn" type="button" class="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-blue-700">Trade this stock</button>
               </div>
 
               <div>
                 <h4 id="stockChartHeading" class="font-semibold mb-4">Live price samples</h4>
+                <div class="flex justify-end gap-2 mb-2">
+                  <button type="button" data-chart-zoom-out="detailedChart" aria-label="Zoom out on stock chart" class="rounded border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50">−</button>
+                  <button type="button" data-chart-zoom-in="detailedChart" aria-label="Zoom in on stock chart" class="rounded border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50">+</button>
+                  <button type="button" data-chart-reset="detailedChart" class="rounded border border-slate-300 px-3 py-1 text-xs hover:bg-slate-50">Reset view</button>
+                </div>
                 <canvas id="detailedChart" height="100"></canvas>
+                <div class="mt-3 px-1">
+                  <div class="flex items-center justify-between text-xs text-slate-500 mb-1"><label for="detailedChartRange">Visible date range</label><span id="detailedChartRangeLabel">Recent sessions</span></div>
+                  <input id="detailedChartRange" data-chart-range="detailedChart" type="range" min="0" max="0" value="0" step="1" aria-label="Scroll through stock chart history" class="w-full accent-blue-600 cursor-pointer" />
+                  <div class="flex justify-between text-[10px] text-slate-400"><span>Older</span><span>Newer</span></div>
+                </div>
+                <p class="text-[11px] text-slate-400 mt-1">Drag to pan · scroll or use +/− to zoom · move over a candle to track OHLC and volume.</p>
               </div>
             </div>
           </div>
@@ -369,8 +431,28 @@
         </section>
 
         <section id="view-ai" class="view-panel hidden">
-          <h2 class="text-2xl font-bold">Market Signals</h2>
-          <p class="text-sm text-slate-500 mt-1">Momentum indicators from the selected exchange. Educational only; not investment advice.</p>
+          <h2 class="text-2xl font-bold">AI Market Explainer</h2>
+          <p class="text-sm text-slate-500 mt-1">Ask about a stock by name or ticker for its latest quote, daily move, volume, and recent chart trend. Educational only; not investment advice.</p>
+          <div class="mt-5 bg-white border border-slate-200 rounded-xl p-5">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+              <h3 class="font-semibold">Ask a question</h3>
+              <span id="aiProviderStatus" class="text-xs text-slate-500">Checking AI setup…</span>
+            </div>
+            <form id="aiQuestionForm" class="space-y-3">
+              <label for="aiQuestion" class="sr-only">Question about the market</label>
+              <textarea id="aiQuestion" maxlength="1000" rows="3" required placeholder="For example: What is NABIL's current price and how has it behaved recently?" class="w-full border border-slate-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <p class="text-xs text-slate-500">Uses the selected exchange snapshot and may discuss simulated or delayed data.</p>
+                <button id="aiAskButton" type="submit" class="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-lg px-4 py-2 text-sm font-semibold">Ask AI</button>
+              </div>
+            </form>
+            <div id="aiAnswerWrap" class="hidden mt-4 rounded-lg bg-slate-50 border border-slate-200 p-4" aria-live="polite">
+              <p id="aiAnswer" class="text-sm leading-6 whitespace-pre-wrap"></p>
+              <p id="aiAnswerMeta" class="text-xs text-slate-500 mt-3"></p>
+            </div>
+          </div>
+          <h3 class="font-semibold mt-8">Market momentum signals</h3>
+          <p class="text-xs text-slate-500 mt-1">Reported price changes only; they are not forecasts.</p>
           <div id="aiPanel" class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-5"></div>
         </section>
       </div>
@@ -390,7 +472,8 @@
       <form id="tradeForm">
         <div class="mb-4">
           <label class="block text-xs uppercase text-slate-500 mb-1">Symbol</label>
-          <input id="tradeSymbol" type="text" class="w-full border border-slate-300 rounded-lg p-2 font-mono" readonly />
+          <input id="tradeSymbol" type="text" list="tradeSymbolList" autocomplete="off" placeholder="Type a ticker, e.g. NABIL" class="w-full border border-slate-300 rounded-lg p-2 font-mono uppercase" required />
+          <datalist id="tradeSymbolList"></datalist>
         </div>
         <div class="grid grid-cols-2 gap-3 mb-4">
           <div>
@@ -417,7 +500,7 @@
   <script>
     const DEMO_USER_KEY = 'tradeverse_demo_user';
     const DEMO_DATA_PREFIX = 'tradeverse_demo_data:';
-    const state = { view: 'dashboard', exchange: 'nepse', market: null, marketFetchedAt: 0, portfolio: null, selectedChartSymbol: null, chartTimer: null, csrfToken: null, user: null, performerData: {}, expandedPerformerGroups: new Set() };
+    const state = { view: 'dashboard', exchange: 'nepse', market: null, marketFetchedAt: 0, portfolio: null, selectedChartSymbol: null, chartTimer: null, sessionCandles: {}, csrfToken: null, user: null, performerData: {}, expandedPerformerGroups: new Set() };
 
     async function request(url, options = {}) {
       const method = String(options.method || 'GET').toUpperCase();
@@ -594,6 +677,11 @@
     function renderPortfolio(portfolio) {
       const panel = document.getElementById('portfolioPanel');
       panel.innerHTML = `
+        <form id="addFundsForm" class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-end gap-3">
+          <div class="flex-1"><label for="virtualFundsAmount" class="block text-sm font-semibold text-slate-800">Add virtual money</label><p class="text-xs text-slate-500 mt-1">Choose an amount to add to this exchange's paper-trading cash.</p></div>
+          <div><label for="virtualFundsAmount" class="sr-only">Amount to add</label><input id="virtualFundsAmount" type="number" min="0.01" max="1000000000000" step="0.01" required placeholder="Amount" class="w-full sm:w-44 border border-slate-300 rounded-lg px-3 py-2" /></div>
+          <button type="submit" class="bg-blue-600 text-white rounded-lg px-4 py-2 text-sm font-semibold hover:bg-blue-700">Add virtual funds</button>
+        </form>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Net Worth</p><p class="text-2xl font-bold mt-2 font-mono">${formatMoney(portfolio.totalNetWorth)}</p></div>
           <div class="bg-white p-5 rounded-xl border border-slate-200"><p class="text-xs uppercase text-slate-500">Total P/L</p><p class="text-2xl font-bold mt-2 font-mono ${portfolio.totalProfitLoss >= 0 ? 'text-emerald-600' : 'text-rose-600'}">${formatMoney(portfolio.totalProfitLoss)}</p></div>
@@ -620,6 +708,23 @@
         </div>
       `;
       bindStockLinks();
+      document.getElementById('addFundsForm').addEventListener('submit', event => {
+        event.preventDefault();
+        const amount = Number(document.getElementById('virtualFundsAmount').value);
+        if (!Number.isFinite(amount) || amount <= 0 || amount > 1000000000000) {
+          alert('Enter a virtual cash amount above zero and below 1 trillion.');
+          return;
+        }
+        const account = readDemoAccount();
+        const exchangePortfolio = getDemoExchange(account);
+        exchangePortfolio.cashBalance = Number((Number(exchangePortfolio.cashBalance || 0) + amount).toFixed(2));
+        writeDemoAccount(account);
+        state.portfolio = calculatePortfolio(exchangePortfolio);
+        document.getElementById('buyingPower').textContent = formatMoney(state.portfolio.cashBalance);
+        document.getElementById('availableCash').textContent = formatMoney(state.portfolio.cashBalance);
+        document.getElementById('portfolioValue').textContent = formatMoney(state.portfolio.totalNetWorth);
+        renderPortfolio(state.portfolio);
+      });
     }
 
     function demoDataKey() {
@@ -741,6 +846,7 @@
           const symbol = link.dataset.symbol;
           // Switch to Charts view if not already there
           if (state.view !== 'charts') {
+            state.view = 'charts';
             showView('charts');
             await loadCharts();
           }
@@ -763,6 +869,7 @@
       state.market = { ...marketExchange, ...data, stocks: data.marketOverview || marketExchange.stocks || [] };
       state.marketFetchedAt = Date.now();
       state.currentPrice = data.marketOverview?.[0]?.price || 0;
+      populateStockSearch(state.market.stocks || []);
       state.portfolio = await getPortfolioState();
       document.getElementById('activeCurrency').textContent = state.market.currency || 'NPR';
       renderMarketStatus(data.marketStatus || state.market.marketStatus);
@@ -808,6 +915,107 @@
       const stocks = data.stocks || [];
       const topStocks = stocks.sort((a, b) => Math.abs(b.change) - Math.abs(a.change)).slice(0, 8);
       renderAi(topStocks);
+      const status = document.getElementById('aiProviderStatus');
+      try {
+        const aiStatus = await fetchJson('/api/ai/status');
+        status.textContent = aiStatus.configured
+          ? `OpenAI ready · ${aiStatus.model}`
+          : 'Built-in explainer ready · OpenAI optional';
+        status.className = `text-xs ${aiStatus.configured ? 'text-emerald-700' : 'text-amber-700'}`;
+      } catch {
+        status.textContent = 'AI setup status unavailable';
+      }
+    }
+
+    async function askAiQuestion(event) {
+      event.preventDefault();
+      const question = document.getElementById('aiQuestion').value.trim();
+      if (!question) return;
+      const button = document.getElementById('aiAskButton');
+      const answerWrap = document.getElementById('aiAnswerWrap');
+      const answer = document.getElementById('aiAnswer');
+      const meta = document.getElementById('aiAnswerMeta');
+      button.disabled = true;
+      button.textContent = 'Thinking…';
+      answer.textContent = '';
+      meta.textContent = '';
+      answerWrap.classList.remove('hidden');
+      try {
+        const stocks = state.market?.stocks || [];
+        const tokens = new Set((question.toUpperCase().match(/[A-Z0-9.-]+/g) || []));
+        const mentionedStock = stocks.find(stock => {
+          const symbol = String(stock.symbol || '').toUpperCase();
+          const company = String(stock.company || '').trim().toLowerCase();
+          return (symbol && tokens.has(symbol)) || (company.length > 3 && question.toLowerCase().includes(company));
+        });
+        const focus = mentionedStock || stocks.find(stock => stock.symbol === state.selectedChartSymbol);
+        let focusStock = null;
+        let focusHistory = [];
+        if (focus) {
+          let historySource = '';
+          try {
+            const stockHistory = await fetchJson(`/api/history/${encodeURIComponent(focus.symbol)}?days=30&exchange=${encodeURIComponent(state.exchange)}`);
+            focusHistory = stockHistory.history || [];
+            historySource = stockHistory.dataSource === 'twelve-data-daily' ? 'Twelve Data daily OHLC' : 'simulated historical OHLC';
+          } catch {
+            focusHistory = [];
+          }
+          const isProviderHistory = historySource === 'Twelve Data daily OHLC';
+          if (!isProviderHistory && focusHistory.length && Number(focusHistory.at(-1).close) > 0 && Number(focus.price) > 0) {
+            const ratio = Number(focus.price) / Number(focusHistory.at(-1).close);
+            focusHistory.forEach(candle => {
+              candle.open = Number((candle.open * ratio).toFixed(2));
+              candle.high = Number((candle.high * ratio).toFixed(2));
+              candle.low = Number((candle.low * ratio).toFixed(2));
+              candle.close = Number((candle.close * ratio).toFixed(2));
+            });
+          }
+          focusHistory = focusHistory.slice(-30);
+          focusStock = {
+            symbol: focus.symbol, company: focus.company, sector: focus.sector,
+            price: focus.price, change: focus.change, pointChange: stockPointChange(focus),
+            open: focus.open, high: focus.high, low: focus.low, volume: focus.volume,
+            dataSource: historySource ? `${historySource}; quote source: ${focus.dataSource || state.market?.source || 'unknown'}` : (focus.dataSource || state.market?.source || 'quote source unavailable'),
+            updatedAt: focus.updatedAt || state.market?.updatedAt
+          };
+        }
+        const result = await request('/api/ai/explain', {
+          method: 'POST',
+          body: JSON.stringify({
+            question,
+            exchange: state.exchange,
+            market: state.market ? {
+              name: state.market.name,
+              currency: state.market.currency,
+              indexName: state.market.indexName,
+              index: state.market.index,
+              indexChange: state.market.indexChange,
+              indexChangePercent: state.market.indexChangePercent,
+              source: state.market.source,
+              updatedAt: state.market.updatedAt,
+              stocks: (state.market.stocks || []).slice(0, 12).map(stock => ({
+                symbol: stock.symbol,
+                company: stock.company,
+                price: stock.price,
+                change: stock.change,
+                pointChange: stock.pointChange,
+                volume: stock.volume
+              })),
+              focusStock,
+              focusHistory
+            } : null
+          })
+        });
+        answer.textContent = result.answer;
+        meta.textContent = result.source === 'openai'
+          ? `Generated by ${result.model} · Verify market data with its source.`
+          : 'Built-in educational explanation · OpenAI key not required.';
+      } catch (error) {
+        answer.textContent = error.message;
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Ask AI';
+      }
     }
 
     async function loadMarket() {
@@ -820,110 +1028,248 @@
       renderMarkets(data.stocks || []);
     }
 
-    // Candlestick chart rendering
-    function renderCandlestickChart(canvasId, ohlcData) {
-      const ctx = document.getElementById(canvasId).getContext('2d');
-      
-      if (window[canvasId + '_chart']) {
-        window[canvasId + '_chart'].destroy();
-      }
-
-      const dates = ohlcData.map(d => d.date);
-      const closes = ohlcData.map(d => d.close);
-      const opens = ohlcData.map(d => d.open);
-      const highs = ohlcData.map(d => d.high);
-      const lows = ohlcData.map(d => d.low);
-
-      const chart = new Chart(ctx, {
+    // Candlestick and volume chart drawn on Chart.js scales.
+    function renderCandlestickChart(canvasId, ohlcData, currency = 'NPR') {
+      const canvas = document.getElementById(canvasId);
+      const rows = (ohlcData || []).filter(day => [day.open, day.high, day.low, day.close].every(value => Number.isFinite(Number(value))));
+      if (!canvas || !rows.length || typeof Chart === 'undefined') return;
+      const chartKey = `${canvasId}_chart`;
+      window[chartKey]?.destroy();
+      const maxVolume = Math.max(...rows.map(day => Number(day.volume) || 0), 1);
+      const candlePlugin = {
+        id: `${canvasId}-candles`,
+        afterDatasetsDraw(chart) {
+          const { ctx, chartArea, scales } = chart;
+          const xScale = scales.x;
+          const yScale = scales.y;
+          const visibleCount = Math.max(1, Number(xScale.max) - Number(xScale.min) + 1);
+          const step = chartArea.width / visibleCount;
+          const candleWidth = Math.max(2, Math.min(12, step * 0.58));
+          ctx.save();
+          ctx.beginPath();
+          ctx.rect(chartArea.left, chartArea.top, chartArea.width, chartArea.height);
+          ctx.clip();
+          rows.forEach((day, index) => {
+            const x = xScale.getPixelForValue(index);
+            const up = Number(day.close) >= Number(day.open);
+            const color = up ? '#0f9f82' : '#ef5350';
+            const openY = yScale.getPixelForValue(Number(day.open));
+            const closeY = yScale.getPixelForValue(Number(day.close));
+            const highY = yScale.getPixelForValue(Number(day.high));
+            const lowY = yScale.getPixelForValue(Number(day.low));
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(x, highY);
+            ctx.lineTo(x, lowY);
+            ctx.stroke();
+            ctx.fillStyle = color;
+            ctx.fillRect(x - candleWidth / 2, Math.min(openY, closeY), candleWidth, Math.max(1, Math.abs(closeY - openY)));
+            const volumeHeight = (Number(day.volume) || 0) / maxVolume * 24;
+            ctx.globalAlpha = 0.25;
+            ctx.fillRect(x - candleWidth / 2, chartArea.bottom - volumeHeight, candleWidth, volumeHeight);
+            ctx.globalAlpha = 1;
+          });
+          if (Number.isInteger(chart.$crosshairIndex)) {
+            const x = xScale.getPixelForValue(chart.$crosshairIndex);
+            if (x >= chartArea.left && x <= chartArea.right) {
+              ctx.strokeStyle = 'rgba(15, 23, 42, 0.55)';
+              ctx.setLineDash([4, 4]);
+              ctx.beginPath();
+              ctx.moveTo(x, chartArea.top);
+              ctx.lineTo(x, chartArea.bottom);
+              ctx.stroke();
+              ctx.setLineDash([]);
+            }
+          }
+          ctx.restore();
+        }
+      };
+      window[chartKey] = new Chart(canvas.getContext('2d'), {
         type: 'line',
         data: {
-          labels: dates,
-          datasets: [
-            {
-              label: 'Close',
-              data: closes,
-              borderColor: '#3b82f6',
-              backgroundColor: 'rgba(59, 130, 246, 0.05)',
-              borderWidth: 2,
-              fill: true,
-              tension: 0.3,
-              pointRadius: 0,
-              pointHoverRadius: 4,
-              yAxisID: 'y'
-            },
-            {
-              label: 'High',
-              data: highs,
-              borderColor: '#10b981',
-              borderWidth: 1,
-              borderDash: [5, 5],
-              fill: false,
-              tension: 0.3,
-              pointRadius: 0,
-              yAxisID: 'y'
-            },
-            {
-              label: 'Low',
-              data: lows,
-              borderColor: '#ef4444',
-              borderWidth: 1,
-              borderDash: [5, 5],
-              fill: false,
-              tension: 0.3,
-              pointRadius: 0,
-              yAxisID: 'y'
-            }
-          ]
+          labels: rows.map(day => day.date),
+          datasets: [{
+            label: 'OHLC',
+            data: rows.map(day => Number(day.close)),
+            borderColor: 'rgba(0,0,0,0)',
+            backgroundColor: 'rgba(0,0,0,0)',
+            borderWidth: 0,
+            pointRadius: 0,
+            pointHitRadius: 10,
+            showLine: false
+          }]
         },
+        plugins: [candlePlugin],
         options: {
           responsive: true,
           maintainAspectRatio: true,
-          interaction: {
-            mode: 'index',
-            intersect: false
-          },
+          interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: {
-              display: true,
-              position: 'top',
-              labels: { boxWidth: 12, font: { size: 11 }, padding: 15 }
-            },
+            legend: { display: false },
             tooltip: {
-              backgroundColor: 'rgba(0, 0, 0, 0.8)',
-              padding: 8,
-              titleFont: { size: 12 },
-              bodyFont: { size: 11 },
-              cornerRadius: 4,
-              displayColors: true,
               callbacks: {
-                afterLabel: function(context) {
-                  const idx = context.dataIndex;
-                  if (context.dataset.label === 'Close') {
-                    const ohlc = ohlcData[idx];
-                    return `Open: ${ohlc.open}\nHigh: ${ohlc.high}\nLow: ${ohlc.low}\nVol: ${(ohlc.volume / 1000).toFixed(0)}K`;
-                  }
-                  return '';
+                title: items => items.length ? rows[items[0].dataIndex].date : '',
+                label: item => {
+                  const candle = rows[item.dataIndex];
+                  return [
+                    `Open: ${formatMarketValue(candle.open, 2)}`,
+                    `High: ${formatMarketValue(candle.high, 2)}`,
+                    `Low: ${formatMarketValue(candle.low, 2)}`,
+                    `Close: ${formatMarketValue(candle.close, 2)}`,
+                    `Volume: ${formatMarketValue(candle.volume || 0)}`
+                  ];
                 }
               }
             }
           },
           scales: {
             y: {
-              type: 'linear',
-              position: 'left',
-              title: { display: true, text: 'Price (NPR)' },
-              grid: { color: 'rgba(0, 0, 0, 0.05)' }
+              min: Math.min(...rows.map(day => Number(day.low))) * 0.998,
+              max: Math.max(...rows.map(day => Number(day.high))) * 1.002,
+              title: { display: true, text: `Price (${currency})` },
+              grid: { color: 'rgba(15, 23, 42, 0.07)' },
+              ticks: { callback: value => formatMarketValue(value, 2) }
             },
             x: {
-              title: { display: true, text: 'Date' },
+              min: Math.max(0, rows.length - 90),
+              max: rows.length - 1,
               grid: { display: false },
-              ticks: { maxRotation: 45, minRotation: 0, maxTicksLimit: 10 }
+              ticks: { maxRotation: 0, maxTicksLimit: 10 }
             }
           }
         }
       });
+      window[chartKey].$ohlcRows = rows;
+      window[chartKey].$fullRange = { min: 0, max: rows.length - 1 };
+      window[chartKey].$visibleSpan = Number(window[chartKey].options.scales.x.max) - Number(window[chartKey].options.scales.x.min) + 1;
+      updateCandlestickRangeSlider(window[chartKey]);
+      setupCandlestickInteractions(canvas, chartKey);
+    }
 
-      window[canvasId + '_chart'] = chart;
+    function updateCandlestickRangeSlider(chart) {
+      const rows = chart?.$ohlcRows || [];
+      const chartId = chart?.canvas?.id || '';
+      const slider = document.querySelector(`[data-chart-range="${chartId}"]`);
+      const label = document.getElementById(`${chartId}RangeLabel`);
+      if (!slider || !label || !rows.length) return;
+      const min = Number(chart.options.scales.x.min ?? 0);
+      const max = Number(chart.options.scales.x.max ?? rows.length - 1);
+      const visible = Math.max(1, Math.min(rows.length, Math.round(chart.$visibleSpan || (max - min + 1))));
+      const sliderMax = Math.max(0, rows.length - visible);
+      slider.max = String(sliderMax);
+      slider.value = String(Math.max(0, Math.min(sliderMax, Math.round(min))));
+      slider.disabled = sliderMax === 0;
+      const firstDate = rows[Math.max(0, Math.floor(min))]?.date || '';
+      const lastDate = rows[Math.min(rows.length - 1, Math.ceil(max))]?.date || '';
+      label.textContent = firstDate && lastDate ? `${firstDate} — ${lastDate}` : 'Recent sessions';
+    }
+
+    function applyCandlestickRange(chart, min, max) {
+      const rows = chart?.$ohlcRows || [];
+      if (!rows.length) return;
+      const start = Math.max(0, Math.floor(min));
+      const end = Math.min(rows.length - 1, Math.ceil(max));
+      const visible = rows.slice(start, end + 1);
+      if (!visible.length) return;
+      chart.options.scales.x.min = min;
+      chart.options.scales.x.max = max;
+      chart.$visibleSpan = max - min + 1;
+      chart.options.scales.y.min = Math.min(...visible.map(day => Number(day.low))) * 0.998;
+      chart.options.scales.y.max = Math.max(...visible.map(day => Number(day.high))) * 1.002;
+      chart.update('none');
+      updateCandlestickRangeSlider(chart);
+    }
+
+    function zoomCandlestickChart(chartId, factor, anchorFraction = 0.5) {
+      const chart = window[`${chartId}_chart`];
+      if (!chart?.$ohlcRows?.length) return;
+      const rows = chart.$ohlcRows;
+      const oldMin = Number(chart.scales.x.min);
+      const oldMax = Number(chart.scales.x.max);
+      const oldSpan = oldMax - oldMin + 1;
+      const span = Math.max(6, Math.min(rows.length, oldSpan * factor));
+      const center = oldMin + (oldMax - oldMin) * Math.max(0, Math.min(1, anchorFraction));
+      let min = center - (center - oldMin) * (span / oldSpan);
+      let max = min + span - 1;
+      if (min < 0) { max -= min; min = 0; }
+      if (max > rows.length - 1) { min -= max - (rows.length - 1); max = rows.length - 1; }
+      applyCandlestickRange(chart, Math.max(0, min), Math.min(rows.length - 1, max));
+    }
+
+    function resetCandlestickChart(chartId) {
+      const chart = window[`${chartId}_chart`];
+      if (!chart?.$ohlcRows?.length) return;
+      const max = chart.$ohlcRows.length - 1;
+      applyCandlestickRange(chart, Math.max(0, max - 89), max);
+      chart.$crosshairIndex = null;
+    }
+
+    function setupCandlestickInteractions(canvas, chartKey) {
+      if (canvas.$candleInteractionsReady) return;
+      canvas.$candleInteractionsReady = true;
+      canvas.style.touchAction = 'none';
+      const currentChart = () => window[chartKey];
+      const pointerIndex = (chart, event) => {
+        const { left, right } = chart.chartArea;
+        const min = Number(chart.scales.x.min);
+        const max = Number(chart.scales.x.max);
+        const fraction = Math.max(0, Math.min(1, (event.offsetX - left) / (right - left)));
+        return Math.max(Math.ceil(min), Math.min(Math.floor(max), Math.round(min + fraction * (max - min))));
+      };
+      canvas.addEventListener('pointerdown', event => {
+        const chart = currentChart();
+        if (!chart?.chartArea || event.offsetX < chart.chartArea.left || event.offsetX > chart.chartArea.right || event.offsetY < chart.chartArea.top || event.offsetY > chart.chartArea.bottom) return;
+        chart.$panStart = { x: event.offsetX, min: Number(chart.scales.x.min), max: Number(chart.scales.x.max) };
+        canvas.style.cursor = 'grabbing';
+        canvas.setPointerCapture?.(event.pointerId);
+      });
+      canvas.addEventListener('pointermove', event => {
+        const chart = currentChart();
+        if (!chart?.chartArea) return;
+        if (chart.$panStart) {
+          const shift = (chart.$panStart.x - event.offsetX) / chart.chartArea.width * (chart.$panStart.max - chart.$panStart.min + 1);
+          const span = chart.$panStart.max - chart.$panStart.min;
+          let min = chart.$panStart.min + shift;
+          let max = min + span;
+          if (min < 0) { max -= min; min = 0; }
+          if (max > chart.$ohlcRows.length - 1) { min -= max - (chart.$ohlcRows.length - 1); max = chart.$ohlcRows.length - 1; }
+          applyCandlestickRange(chart, Math.max(0, min), Math.min(chart.$ohlcRows.length - 1, max));
+          return;
+        }
+        if (event.offsetX < chart.chartArea.left || event.offsetX > chart.chartArea.right) return;
+        const index = pointerIndex(chart, event);
+        chart.$crosshairIndex = index;
+        const active = [{ datasetIndex: 0, index }];
+        chart.setActiveElements(active);
+        chart.tooltip?.setActiveElements(active, { x: event.offsetX, y: event.offsetY });
+        chart.update('none');
+        canvas.style.cursor = 'crosshair';
+      });
+      const endPan = event => {
+        const chart = currentChart();
+        if (chart) chart.$panStart = null;
+        canvas.style.cursor = 'crosshair';
+        if (event?.pointerId !== undefined && canvas.hasPointerCapture?.(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+      };
+      canvas.addEventListener('pointerup', endPan);
+      canvas.addEventListener('pointercancel', endPan);
+      canvas.addEventListener('pointerleave', () => {
+        const chart = currentChart();
+        if (!chart || chart.$panStart) return;
+        chart.$crosshairIndex = null;
+        chart.setActiveElements([]);
+        chart.tooltip?.setActiveElements([], { x: 0, y: 0 });
+        chart.update('none');
+        canvas.style.cursor = 'default';
+      });
+      canvas.addEventListener('wheel', event => {
+        const chart = currentChart();
+        if (!chart?.chartArea || event.offsetX < chart.chartArea.left || event.offsetX > chart.chartArea.right) return;
+        event.preventDefault();
+        const fraction = (event.offsetX - chart.chartArea.left) / chart.chartArea.width;
+        zoomCandlestickChart(canvas.id, event.deltaY < 0 ? 0.8 : 1.25, fraction);
+      }, { passive: false });
     }
 
     function formatMarketValue(value, fractionDigits = 0) {
@@ -994,8 +1340,9 @@
 
     function renderIndexSnapshot(data) {
       const index = Number(data.index ?? data.nepseIndex ?? 0);
-      const change = Number(data.indexChange || 0);
-      const percent = Number(data.indexChangePercent || 0);
+      const movement = indexPointAndPercent(data);
+      const change = movement.points;
+      const percent = movement.percent;
       const live = data.source === 'nepse-live';
       const open = live && isMarketOpen(data.marketStatus);
       const timestamp = data.updatedAt || data.marketStatus?.asOf;
@@ -1015,13 +1362,117 @@
       document.getElementById('marketDeclines').textContent = formatMarketValue(stats.declines);
       document.getElementById('marketUnchanged').textContent = formatMarketValue(stats.unchanged);
       renderMarketStatus(data.marketStatus);
-      const samples = recordLiveSample('NEPSE', index, timestamp, data.source);
-      renderLiveSampleChart('nepseChart', samples, data.marketDataState === 'LIVE' ? 'Live index' : 'Previous close', change < 0 ? '#e5484d' : '#16876b');
-      document.getElementById('nepseChartMessage').textContent = !live
-        ? 'The live NEPSE feed is unavailable for this deployment.'
-        : open && samples.length < 2
-          ? 'Live samples accumulate while the market is open.'
-          : `${samples.length} observed index sample${samples.length === 1 ? '' : 's'} · high ${formatMarketValue(data.indexHigh, 2)} · low ${formatMarketValue(data.indexLow, 2)}`;
+      document.getElementById('nepseChartMessage').textContent = 'Loading simulated historical candlesticks…';
+    }
+
+    function marketLocalDate(market) {
+      const timeZone = market?.marketStatus?.timeZone || market?.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const parts = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date()).map(part => [part.type, part.value]));
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    function updateSessionCandle(history, quote, market, options = {}) {
+      if (!Array.isArray(history) || !history.length || !quote) return history || [];
+      const value = Number(quote.price);
+      if (!Number.isFinite(value) || value <= 0) return history;
+      const today = marketLocalDate(market);
+      const status = market?.marketStatus || {};
+      const open = status.isOpen === true || String(status.state || status.status || '').toUpperCase() === 'OPEN';
+      const latestTradeDate = String(options.updatedAt || market?.updatedAt || '').slice(0, 10);
+      const key = `${market?.id || state.exchange}:${options.symbol || 'index'}`;
+      const storageKey = `tradeverse.sessionCandle.${key}`;
+      let stored = state.sessionCandles[key] || null;
+      try {
+        stored = JSON.parse(localStorage.getItem(storageKey) || 'null') || stored;
+      } catch {}
+      if (stored?.date && stored.date < today) {
+        const oldIndex = history.findIndex(candle => candle.date === stored.date);
+        if (oldIndex >= 0) history[oldIndex] = { ...history[oldIndex], ...stored };
+        else history.push({ ...stored });
+        history.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      }
+      const current = history.find(candle => candle.date === today);
+      const cached = stored?.date === today ? stored : null;
+      const dayName = new Intl.DateTimeFormat('en-US', { timeZone: status.timeZone || market?.timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone, weekday: 'short' }).format(new Date());
+      const simulatedWeekday = ['mock-provider', 'simulated-provider'].includes(market?.source) && !['Sat', 'Sun'].includes(dayName);
+      // A closed market only gets a candle when today's session was already observed
+      // or the quote itself was updated today. This avoids inventing weekend candles.
+      if (!current && !open && latestTradeDate !== today && !simulatedWeekday) return history;
+      const previous = history.filter(candle => candle.date < today).at(-1) || history.at(-1);
+      const previousClose = Number(options.previousClose) > 0
+        ? Number(options.previousClose)
+        : Number(previous?.close) > 0 ? Number(previous.close) : value;
+      const candle = cached || current || {
+        date: today,
+        timestamp: Date.now(),
+        open: Number(options.open) > 0 ? Number(options.open) : previousClose,
+        high: Math.max(previousClose, value),
+        low: Math.min(previousClose, value),
+        close: value,
+        volume: 0
+      };
+      candle.open = cached ? Number(cached.open) : Number(options.open) > 0
+        ? Number(options.open)
+        : current && options.preserveProviderOpen ? Number(candle.open || previousClose) : previousClose;
+      candle.high = Number(options.high) > 0
+        ? Math.max(Number(candle.high) || Number(options.high), Number(options.high), candle.open, value)
+        : Math.max(cached ? Number(cached.high) : (current && options.preserveProviderOpen ? Number(candle.high) : previousClose), candle.open, value);
+      candle.low = Number(options.low) > 0
+        ? Math.min(Number(candle.low) || Number(options.low), Number(options.low), candle.open, value)
+        : Math.min(cached ? Number(cached.low) : (current && options.preserveProviderOpen ? Number(candle.low) : previousClose), candle.open, value);
+      candle.close = value;
+      if (Number.isFinite(Number(options.volume))) candle.volume = Number(options.volume);
+      if (!current) history.push(candle);
+      state.sessionCandles[key] = { ...candle };
+      try { localStorage.setItem(storageKey, JSON.stringify(candle)); } catch {}
+      return history;
+    }
+
+    async function loadIndexCandles(exchange = state.exchange) {
+      const result = await fetchJson(`/api/history/index?exchange=${encodeURIComponent(exchange)}&days=180`);
+      const change = indexPointAndPercent(state.market || {});
+      const history = updateSessionCandle(result.history, { price: state.market?.index }, state.market, {
+        previousClose: Number(state.market?.index || 0) - change.points,
+        high: state.market?.indexHigh,
+        low: state.market?.indexLow,
+        volume: state.market?.marketStats?.sharesTraded,
+        updatedAt: state.market?.updatedAt,
+        symbol: `${exchange}-index`
+      });
+      renderCandlestickChart('nepseChart', history, state.market?.currency || 'NPR');
+      const open = state.market?.marketStatus?.isOpen === true;
+      document.getElementById('nepseChartMessage').textContent = `Simulated historical candlesticks · ${history.length} sessions · today’s candle ${open ? 'updates with the latest quote while the market is open' : 'is final at the last available trade'}`;
+    }
+
+    function stockPointChange(stock) {
+      const explicit = Number(stock?.pointChange);
+      if (Number.isFinite(explicit) && (explicit !== 0 || Number(stock?.change || 0) === 0)) return explicit;
+      const price = Number(stock?.price || 0);
+      const percent = Number(stock?.change || 0);
+      return price > 0 && percent > -100 ? price * percent / (100 + percent) : 0;
+    }
+
+    function indexPointAndPercent(data) {
+      const index = Number(data?.index ?? data?.nepseIndex ?? 0);
+      if (data?.id && data.id !== 'nepse') {
+        const percent = Number(data.indexChangePercent ?? data.indexChange ?? 0);
+        return { points: index * percent / 100, percent };
+      }
+      const points = Number(data?.indexChange || 0);
+      const percent = Number.isFinite(Number(data?.indexChangePercent))
+        ? Number(data.indexChangePercent)
+        : index > points ? points / (index - points) * 100 : 0;
+      return { points, percent };
+    }
+
+    function openTradeForStock(symbol) {
+      const stock = state.market?.stocks?.find(item => item.symbol === symbol);
+      if (!stock) return;
+      document.getElementById('tradeSymbol').value = symbol;
+      state.currentPrice = Number(stock.price || 0);
+      updateTradeTotal();
+      document.getElementById('tradeModal').classList.remove('hidden');
+      document.getElementById('tradeModal').classList.add('flex');
     }
 
     function populateStockSearch(stocks) {
@@ -1031,12 +1482,14 @@
       holdings.forEach(item => {
         if (!bySymbol.has(item.symbol)) bySymbol.set(item.symbol, item);
       });
-      datalist.replaceChildren(...[...bySymbol.values()].map(stock => {
+      const options = [...bySymbol.values()].map(stock => {
         const option = document.createElement('option');
         option.value = stock.symbol;
         option.label = stock.company || stock.symbol;
         return option;
-      }));
+      });
+      datalist.replaceChildren(...options.map(option => option.cloneNode(true)));
+      document.getElementById('tradeSymbolList').replaceChildren(...options);
     }
 
     async function refreshChartMarket() {
@@ -1044,6 +1497,7 @@
       state.market = data;
       state.marketFetchedAt = Date.now();
       renderIndexSnapshot(data);
+      await loadIndexCandles(state.exchange);
       if (state.selectedChartSymbol) await loadStockDetail(state.selectedChartSymbol, false);
     }
 
@@ -1055,14 +1509,16 @@
         state.market = data;
         state.marketFetchedAt = Date.now();
         renderIndexSnapshot(data);
+        await loadIndexCandles(state.exchange);
         populateStockSearch(data.stocks || []);
         const input = document.getElementById('stockChartSearch');
         const firstSymbol = (data.stocks || []).some(stock => stock.symbol === 'NABIL') ? 'NABIL' : data.stocks?.[0]?.symbol;
         if (!input.value || !data.stocks?.some(stock => stock.symbol === input.value)) input.value = firstSymbol || '';
         if (input.value) await loadStockDetail(input.value, false);
         if (state.chartTimer) clearInterval(state.chartTimer);
-        if (data.source === 'nepse-live' && isMarketOpen(data.marketStatus)) {
-          state.chartTimer = setInterval(() => refreshChartMarket().catch(error => console.error('Live chart refresh failed:', error)), 60000);
+        if (isMarketOpen(data.marketStatus)) {
+          const interval = data.source === 'nepse-live' ? 60000 : 300000;
+          state.chartTimer = setInterval(() => refreshChartMarket().catch(error => console.error('Live chart refresh failed:', error)), interval);
         }
       } catch (error) {
         console.error('Error loading chart data:', error);
@@ -1074,39 +1530,62 @@
       try {
         const normalizedSymbol = String(symbol || '').trim().toUpperCase();
         if (!normalizedSymbol) return;
-        if (state.exchange !== 'nepse') {
-          const stockData = await fetchJson(`/api/history/${normalizedSymbol}?days=180&exchange=${state.exchange}`);
-          document.getElementById('detailedChartTitle').textContent = `${normalizedSymbol} - ${stockData.company}`;
-          document.getElementById('detailedChartTradingDate').textContent = `${stockData.dataSource === 'twelve-data-daily' ? 'Twelve Data daily bars' : 'Simulated history'} · as of ${stockData.history.at(-1)?.date || stockData.tradingStartDate}`;
-          document.getElementById('detailedPrice').textContent = formatMarketValue(stockData.currentPrice, 2);
-          document.getElementById('detailedChange').textContent = `${stockData.currentChange >= 0 ? '+' : ''}${stockData.currentChange.toFixed(2)}%`;
-          document.getElementById('detailedHigh').textContent = formatMarketValue(Math.max(...stockData.history.map(item => item.high)), 2);
-          document.getElementById('detailedLow').textContent = formatMarketValue(Math.min(...stockData.history.map(item => item.low)), 2);
-          document.getElementById('stockChartHeading').textContent = 'Simulated price history';
-          document.getElementById('selectedStockChart').classList.remove('hidden');
-          renderCandlestickChart('detailedChart', stockData.history);
-          return;
-        }
-
         let stock = state.market?.stocks?.find(item => item.symbol === normalizedSymbol);
         if (!stock) {
-          state.market = await fetchJson('/api/market?exchange=nepse');
+          state.market = await fetchJson(`/api/market?exchange=${encodeURIComponent(state.exchange)}`);
           stock = state.market.stocks?.find(item => item.symbol === normalizedSymbol);
           populateStockSearch(state.market.stocks || []);
         }
-        if (!stock) throw new Error(`No current NEPSE quote is available for ${normalizedSymbol}.`);
+        if (!stock) throw new Error(`No current quote is available for ${normalizedSymbol} on this exchange.`);
         state.selectedChartSymbol = normalizedSymbol;
         document.getElementById('stockChartSearch').value = normalizedSymbol;
-        document.getElementById('detailedChartTitle').textContent = `${normalizedSymbol} - ${stock.company || normalizedSymbol}`;
-        document.getElementById('detailedChartTradingDate').textContent = `${state.market.marketDataState || 'NEPSE'} · ${state.market.updatedAt || ''}`;
+        const history = await fetchJson(`/api/history/${encodeURIComponent(normalizedSymbol)}?days=180&exchange=${encodeURIComponent(state.exchange)}`);
+        const candles = history.history || [];
+        const isProviderHistory = history.dataSource === 'twelve-data-daily';
+        if (!isProviderHistory && candles.length && Number(candles.at(-1).close) > 0 && Number(stock.price) > 0) {
+          const ratio = Number(stock.price) / Number(candles.at(-1).close);
+          candles.forEach(candle => {
+            candle.open = Number((candle.open * ratio).toFixed(2));
+            candle.high = Number((candle.high * ratio).toFixed(2));
+            candle.low = Number((candle.low * ratio).toFixed(2));
+            candle.close = Number((candle.close * ratio).toFixed(2));
+          });
+        }
+        const changePoints = stockPointChange(stock);
+        updateSessionCandle(candles, { price: stock.price }, state.market, {
+          previousClose: Number(stock.price) - changePoints,
+          open: stock.open,
+          high: stock.high,
+          low: stock.low,
+          volume: stock.volume,
+          updatedAt: stock.updatedAt || state.market.updatedAt,
+          preserveProviderOpen: isProviderHistory,
+          symbol: normalizedSymbol
+        });
+        const changePercent = Number(stock.change || 0);
+        const indexMove = indexPointAndPercent(state.market);
+        const indexPoints = indexMove.points;
+        const indexPercent = indexMove.percent;
+        const changeCurrency = state.market.currency || 'currency';
+        document.getElementById('detailedChartTitle').textContent = `${normalizedSymbol} · ${stock.company || history.company || normalizedSymbol}`;
+        const sessionOpen = isMarketOpen(state.market.marketStatus);
+        document.getElementById('detailedChartTradingDate').textContent = `${isProviderHistory ? 'Twelve Data daily OHLC' : 'Simulated historical OHLC'} · ${sessionOpen ? 'today’s candle follows the latest quote' : 'closed candle holds the last available trade'} · as of ${candles.at(-1)?.date || history.tradingStartDate || 'unavailable'}`;
         document.getElementById('detailedPrice').textContent = formatMarketValue(stock.price, 2);
-        document.getElementById('detailedChange').textContent = `${stock.change >= 0 ? '+' : ''}${formatMarketValue(stock.change, 2)}%`;
-        document.getElementById('detailedHigh').textContent = formatMarketValue(stock.high, 2);
-        document.getElementById('detailedLow').textContent = formatMarketValue(stock.low, 2);
-        document.getElementById('stockChartHeading').textContent = `Observed ${normalizedSymbol} price samples`;
+        const changeElement = document.getElementById('detailedChange');
+        changeElement.textContent = `${changePoints >= 0 ? '+' : ''}${formatMarketValue(changePoints, 2)} ${changeCurrency} · ${changePercent >= 0 ? '+' : ''}${formatMarketValue(changePercent, 2)}%`;
+        changeElement.className = `text-xl font-bold font-mono ${changePoints >= 0 ? 'text-emerald-600' : 'text-rose-600'}`;
+        document.getElementById('detailedIndex').textContent = `${state.market.indexName || 'Index'} · ${formatMarketValue(state.market.index, 2)}`;
+        const indexChangeElement = document.getElementById('detailedIndexChange');
+        indexChangeElement.textContent = `${indexPoints >= 0 ? '+' : ''}${formatMarketValue(indexPoints, 2)} pts · ${indexPercent >= 0 ? '+' : ''}${formatMarketValue(indexPercent, 2)}%`;
+        indexChangeElement.className = `text-lg font-bold font-mono ${indexPoints >= 0 ? 'text-emerald-600' : 'text-rose-600'}`;
+        document.getElementById('detailedHighLow').textContent = `${formatMarketValue(stock.high, 2)} / ${formatMarketValue(stock.low, 2)}`;
+        document.getElementById('detailedOpenVolume').textContent = `${formatMarketValue(stock.open, 2)} / ${formatMarketValue(stock.volume)}`;
+        document.getElementById('detailedSector').textContent = `Sector: ${stock.sector || history.sector || 'Unavailable'} · Source: ${state.market.source || 'unknown'}`;
+        document.getElementById('detailTradeBtn').dataset.symbol = normalizedSymbol;
+        document.getElementById('stockChartHeading').textContent = `${normalizedSymbol} · OHLC and trading volume`;
         document.getElementById('selectedStockChart').classList.remove('hidden');
-        const samples = recordLiveSample(normalizedSymbol, stock.price, state.market.updatedAt, state.market.source);
-        renderLiveSampleChart('detailedChart', samples, normalizedSymbol, Number(stock.change) < 0 ? '#e5484d' : '#16876b');
+        renderCandlestickChart('detailedChart', candles, state.market.currency || 'NPR');
+        document.getElementById('detailTradeBtn').onclick = () => openTradeForStock(normalizedSymbol);
         if (scroll) setTimeout(() => document.getElementById('selectedStockChart').scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
       } catch (error) {
         console.error('Error loading stock detail:', error);
@@ -1127,6 +1606,8 @@
         if (view === 'ai') await loadAi();
       });
     });
+
+    document.getElementById('aiQuestionForm').addEventListener('submit', askAiQuestion);
 
     document.querySelectorAll('.performer-tab').forEach(button => {
       button.addEventListener('click', () => {
@@ -1183,6 +1664,16 @@
     });
 
     document.getElementById('loadStockChart').addEventListener('click', () => loadStockDetail(document.getElementById('stockChartSearch').value));
+    document.querySelectorAll('[data-chart-zoom-in]').forEach(button => button.addEventListener('click', () => zoomCandlestickChart(button.dataset.chartZoomIn, 0.7)));
+    document.querySelectorAll('[data-chart-zoom-out]').forEach(button => button.addEventListener('click', () => zoomCandlestickChart(button.dataset.chartZoomOut, 1.4)));
+    document.querySelectorAll('[data-chart-reset]').forEach(button => button.addEventListener('click', () => resetCandlestickChart(button.dataset.chartReset)));
+    document.querySelectorAll('[data-chart-range]').forEach(slider => slider.addEventListener('input', event => {
+      const chart = window[`${event.currentTarget.dataset.chartRange}_chart`];
+      if (!chart?.$ohlcRows?.length) return;
+      const min = Number(event.currentTarget.value);
+      const span = Math.max(1, Math.round(chart.$visibleSpan || (Number(chart.options.scales.x.max) - Number(chart.options.scales.x.min) + 1)));
+      applyCandlestickRange(chart, min, Math.min(chart.$ohlcRows.length - 1, min + span - 1));
+    }));
     document.getElementById('stockChartSearch').addEventListener('keydown', event => {
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -1191,16 +1682,17 @@
     });
 
     document.getElementById('quickTradeBtn').addEventListener('click', () => {
-      const stock = state.market?.stocks?.[0];
-      if (!stock) {
+      if (!state.market?.stocks?.length) {
         alert('No quote is available to trade for this exchange.');
         return;
       }
-      document.getElementById('tradeSymbol').value = stock.symbol;
-      state.currentPrice = Number(stock?.price || 0);
+      const symbolInput = document.getElementById('tradeSymbol');
+      symbolInput.value = '';
+      state.currentPrice = 0;
       updateTradeTotal();
       document.getElementById('tradeModal').classList.remove('hidden');
       document.getElementById('tradeModal').classList.add('flex');
+      symbolInput.focus();
     });
 
     async function openWorkspace(email) {
@@ -1223,7 +1715,9 @@
       button.disabled = true;
       message.classList.add('hidden');
       try {
-        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Enter a valid email address.');
+        const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        const validUsername = /^[a-z0-9][a-z0-9._-]{2,39}$/.test(email);
+        if (!validEmail && !validUsername) throw new Error('Enter a valid email address or a username of 3–40 letters, numbers, dots, underscores, or hyphens.');
         if (!password) throw new Error('Enter a password to continue.');
         if (password.length > 128) throw new Error('Password must be 128 characters or fewer.');
         localStorage.setItem(DEMO_USER_KEY, email);
@@ -1237,10 +1731,15 @@
       }
     }
 
-    document.getElementById('loginBtn').addEventListener('click', () => authenticate('login'));
+    document.getElementById('loginForm').addEventListener('submit', event => {
+      event.preventDefault();
+      authenticate('login');
+    });
     document.getElementById('signupBtn').addEventListener('click', () => authenticate('signup'));
-    document.getElementById('loginPassword').addEventListener('keydown', event => {
-      if (event.key === 'Enter') document.getElementById('loginBtn').click();
+    document.getElementById('forgotPasswordBtn').addEventListener('click', () => {
+      const message = document.getElementById('authMessage');
+      message.textContent = 'This educational demo does not create accounts or store passwords. Enter a valid email or username and a non-empty password to continue.';
+      message.classList.remove('hidden');
     });
 
     document.getElementById('logoutBtn').addEventListener('click', async () => {
@@ -1275,6 +1774,13 @@
     });
 
     document.getElementById('tradeQty').addEventListener('input', updateTradeTotal);
+    document.getElementById('tradeSymbol').addEventListener('input', event => {
+      const symbol = event.currentTarget.value.trim().toUpperCase();
+      event.currentTarget.value = symbol;
+      const quote = state.market?.stocks?.find(stock => String(stock.symbol).toUpperCase() === symbol);
+      state.currentPrice = Number(quote?.price || 0);
+      updateTradeTotal();
+    });
 
     document.getElementById('tradeForm').addEventListener('submit', async (event) => {
       event.preventDefault();

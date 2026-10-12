@@ -264,6 +264,47 @@ function getNepseHistory(days = 180) {
   };
 }
 
+function getExchangeIndexHistory(exchangeId = 'nepse', days = 180) {
+  const exchange = getExchangeData(exchangeId);
+  const count = Math.min(Math.max(Number(days) || 180, 1), 730);
+  const target = Number(exchange.index) || 1000;
+  const start = target * 0.88;
+  const raw = [];
+  let close = start;
+  for (let i = 0; i <= count; i += 1) {
+    const date = new Date();
+    date.setDate(date.getDate() - (count - i));
+    date.setHours(0, 0, 0, 0);
+    const open = close;
+    close = open * (1 + Math.sin(i * 1.7) * 0.003 + Math.cos(i / 8) * 0.002);
+    raw.push({
+      date: date.toISOString().slice(0, 10),
+      timestamp: date.getTime(),
+      open,
+      high: Math.max(open, close) * (1 + 0.002 + Math.abs(Math.sin(i)) * 0.002),
+      low: Math.min(open, close) * (1 - 0.002 - Math.abs(Math.cos(i)) * 0.002),
+      close,
+      volume: Math.round(500000 + Math.abs(Math.sin(i / 4)) * 1800000)
+    });
+  }
+  const scale = target / (raw.at(-1)?.close || target);
+  const history = raw.map(day => ({
+    ...day,
+    open: Number((day.open * scale).toFixed(2)),
+    high: Number((day.high * scale).toFixed(2)),
+    low: Number((day.low * scale).toFixed(2)),
+    close: Number((day.close * scale).toFixed(2))
+  }));
+  return {
+    symbol: exchange.shortName,
+    name: exchange.indexName,
+    history,
+    currentIndex: target,
+    currentChange: Number(exchange.indexChange || 0),
+    dataSource: 'simulated-history'
+  };
+}
+
 module.exports = {
   stocks,
   exchangeIds,
@@ -272,5 +313,6 @@ module.exports = {
   generateCandlestickData,
   generateNepseIndexHistory,
   getStockHistory,
-  getNepseHistory
+  getNepseHistory,
+  getExchangeIndexHistory
 };
